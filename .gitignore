@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Runtime / temp
+.tmp/
+tmp/
+.cache/
+*.pid
+*.seed
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/
+.vercel/
+
+# Uploads (keep folder, ignore generated files)
+uploads/*
+!uploads/.gitkeep
+
+# Test / coverage
+coverage/
+.nyc_output/
