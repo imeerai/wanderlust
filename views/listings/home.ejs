@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Website</title>
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <section class="hero">
+        <div class="motive">FIND YOUR PERFECT PLACE TO STAY</div>
+
+        <h1 class="hero-title">Explore Comfort & Luxury</h1>
+
+        <p style="margin-top: 10px; font-size:18px; z-index:2;">
+            Discover unique stays, beautiful homes & relaxing spaces.
+        </p>
+
+        <div style="display:flex; gap:20px; margin-top:35px; z-index:2;">
+            <button class="hero-btn" onclick="window.location='/listings'">
+                Browse Listings
+            </button>
+            <% if (!currentUser) { %>
+                <button class="hero-btn" style="background:#222;" onclick="window.location='/login'">
+                    Login Now
+                </button>
+                <% } %>
+        </div>
+
+    </section>
+
+</body>
+
+</html>

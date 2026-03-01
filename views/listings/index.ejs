@@ -1,0 +1,125 @@
+<% layout('/layouts/boilerplate') -%>
+  <% if (success && success.length> 0) { %>
+    <div class="flash">
+      <%= success %>
+    </div>
+    <% } %>
+      <% if(error && error.length> 0){ %>
+        <div class="flash erroor">
+          <%= error %>
+        </div>
+        <% } %>
+        <style>
+          .tax-info{
+            display: none;
+          }
+        </style>
+
+          <div class="container">
+            <div class="listings-topbar">
+              <h3 class="section-title">Popular Listings</h3>
+              <div class="tax-toggle-container">
+                <p>Display total before taxes</p>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="taxToggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="listing-wrapper">
+              <% for (let listing of allListings) { %> <a href="/listings/<%= listing.id %>">
+                  <div class="listing-card">
+                    <% const isGuestFavorite = (typeof guestFavoriteSummary !== 'undefined') && guestFavoriteSummary[String(listing._id)] === true; %>
+                    <div class="img-box"> <img src="<%= listing.image.url %>" alt="">
+                      <% if (isGuestFavorite) { %>
+                        <span class="badge">Top Rated</span>
+                        <span class="heart">♥</span>
+                      <% } %>
+                    </div>
+                    <div class="info">
+                      <h4 class="title">
+                        <%= listing.title %>
+                      </h4>
+                      <% const rating = ratingSummary[String(listing._id)] || { average: 0, count: 0 }; %>
+                      <div class="listing-rating">
+                        <div class="listing-rating-stars">
+                          <% for (let i = 1; i <= 5; i++) { %>
+                            <span class="star <%= i <= Math.round(rating.average) ? 'filled' : '' %>">&#9733;</span>
+                          <% } %>
+                        </div>
+                        <span class="listing-rating-text">
+                          <%= rating.count ? rating.average.toFixed(1) : 'New' %>
+                          (<%= rating.count %>)
+                        </span>
+                      </div>
+                      <p class="price"> &#8360; <%= listing.prize %> for 2 nights <i class="tax-info"> &nbsp; &nbsp;
+                            +18% GST</i> </p>
+                    </div>
+                  </div>
+                </a>
+                <% } %>
+            </div>
+
+            <div class="pagination-wrap">
+              <% if (hasPrev) { %>
+                <a class="page-btn" href="/listings?page=<%= currentPage - 1 %><%= queryTail %>">← Prev</a>
+              <% } else { %>
+                <span class="page-btn disabled">← Prev</span>
+              <% } %>
+
+              <div class="page-numbers">
+                <% for (let page = 1; page <= totalPages; page++) { %>
+                  <a class="page-num <%= page === currentPage ? 'active' : '' %>" href="/listings?page=<%= page %><%= queryTail %>"><%= page %></a>
+                <% } %>
+              </div>
+
+              <% if (hasNext) { %>
+                <a class="page-btn" href="/listings?page=<%= currentPage + 1 %><%= queryTail %>">Next →</a>
+              <% } else { %>
+                <span class="page-btn disabled">Next →</span>
+              <% } %>
+            </div>
+          </div>
+       <script>
+  let taxSwitch = document.getElementById('taxToggle');
+
+  (function syncPerPageByScreen() {
+    const isMobile = window.innerWidth <= 768;
+    const desiredPerPage = isMobile ? "5" : "15";
+    const currentUrl = new URL(window.location.href);
+    const currentPerPage = currentUrl.searchParams.get("perPage");
+
+    if (currentPerPage !== desiredPerPage) {
+      currentUrl.searchParams.set("perPage", desiredPerPage);
+      if (!currentUrl.searchParams.get("page")) {
+        currentUrl.searchParams.set("page", "1");
+      }
+      window.location.replace(currentUrl.toString());
+    }
+  })();
+
+  taxSwitch.addEventListener('click', function () {
+    let taxInfo = document.getElementsByClassName("tax-info");
+    let priceText = document.getElementsByClassName("price");
+
+    for (let i = 0; i < priceText.length; i++) {
+      if (!priceText[i].dataset.base) {
+        priceText[i].dataset.base = priceText[i].innerText.match(/\d+/)[0];
+      }
+
+      let basePrice = Number(priceText[i].dataset.base);
+
+      if (taxSwitch.checked) {
+        let total = Math.round(basePrice + basePrice * 0.18);
+        priceText[i].innerHTML =
+          `&#8360; ${total} for 2 nights <i class="tax-info"> &nbsp; &nbsp; +18% GST</i>`;
+        taxInfo[i].style.display = "inline";
+      } else {
+        priceText[i].innerHTML =
+          `&#8360; ${basePrice} for 2 nights <i class="tax-info"> &nbsp; &nbsp; +18% GST</i>`;
+        taxInfo[i].style.display = "none";
+      }
+    }
+  });
+</script>
