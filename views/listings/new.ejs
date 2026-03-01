@@ -1,0 +1,62 @@
+<% layout('/layouts/boilerplate') -%>
+
+<% if (success && success.length> 0) { %>
+  <div class="flash">
+    <%= success %>
+  </div>
+  <% } %>
+    <% if (error && error.length> 0) { %>
+      <div class="erroor">
+        <%= error %>
+      </div>
+      <% } %>
+<div class="form-container">
+  <h3>Create a New Listing</h3>
+  <form id="listingForm" method="POST" action="/listings" enctype="multipart/form-data">
+
+    <div class="flex-row field-group">
+      <div class="field-wrapper">
+        <label for="title">Title</label>
+        <input name="listing[title]" placeholder="Enter Title" type="text" />
+        <div class="hellow"></div>
+      </div>
+
+      <div class="field-wrapper">
+        <label for="prize">Location</label>
+        <input name="listing[location]" placeholder="Enter Location" type="text" />
+        <div class="hellow"></div>
+      </div>
+    </div>
+
+    <div class="field-wrapper">
+      <label for="prize">Description</label>
+      <textarea name="listing[description]" placeholder="Enter Description"></textarea>
+      <div class="hellow"></div>
+    </div>
+
+    <div class="field-wrapper">
+      <label for="prize">Upload Image</label>
+      <input name="listing[image]"  type="file" />
+      <div class="hellow"></div>
+    </div>
+
+    <div class="flex-row field-group">
+      <div class="field-wrapper">
+        <label for="prize">Price</label>
+        <input name="listing[prize]" placeholder="Enter Price" type="number" />
+        <div class="hellow"></div>
+      </div>
+
+      <div class="field-wrapper">
+        <label for="prize">Country</label>
+        <input name="listing[country]" placeholder="Enter Country" type="text" />
+        <div class="hellow"></div>
+      </div>
+    </div>
+
+    <button type="submit">Add Listing</button>
+  </form>
+</div>
+
+
+

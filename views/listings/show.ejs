@@ -1,0 +1,194 @@
+<% layout('/layouts/boilerplate') -%>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<!-- Flash Messages -->
+<% if (success && success.length > 0) { %>
+  <div class="flash">
+    <%= success %>
+  </div>
+<% } %>
+
+<% if (error && error.length > 0) { %>
+  <div class="erroor">
+    <%= error %>
+  </div>
+<% } %>
+
+<!-- Listing Details -->
+<div class="details-container">
+  <div class="details-main">
+
+    <!-- Image Left -->
+    <div class="image-preview">
+      <img src="<%= listing.image.url %>" alt="Listing Image" />
+    </div>
+
+    <!-- Right Details -->
+    <div class="details-info">
+      <h3 class="details-title">
+        <%= listing.title %>
+      </h3>
+
+      <div class="title-border"></div>
+
+      <ul class="details-list">
+        <li style="margin-bottom: 5px; margin-top: 14px; background: #fff7f9; padding: 6px 10px; border-radius: 6px; font-size: 16px;">
+          <strong>Posted By:</strong> <a class="profile-link" href="/profile/<%= listing.Owner._id %>">@<%= listing.Owner.username %></a>
+        </li>
+        <li style="margin-bottom: 5px;">
+          <strong>Description:</strong> <%- listing.description.trim() %>
+        </li>
+        <li><strong>Prize:</strong> &#x20A8; <%= listing.prize.toLocaleString("en-IN") %></li>
+        <li><strong>Location:</strong> <%= listing.location %></li>
+        <li><strong>Country:</strong> <%= listing.country %></li>
+      </ul>
+
+      <% if (currentUser && listing.Owner._id.equals(currentUser._id)) { %>
+        <div class="details-actions">
+          <a href="/listings/<%= listing._id %>/edit" class="edit-btn">Edit</a>
+          <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" style="width: 50%;">
+            <button type="submit" class="delete-btn">Delete</button>
+          </form>
+        </div>
+      <% } %>
+
+    </div>
+  </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="listing-reviews">
+  <h3 class="reviews-title">All Reviews</h3>
+  <div class="title-border"></div>
+
+  <% if (totalReviews <= 0) { %>
+    <div class="no-review">
+      <p>No reviews yet. Be the first to review!</p>
+    </div>
+  <% } else { %>
+    <div class="previous-reviews">
+      <% for (let review of reviews) { %>
+        <div class="review-card">
+
+          <!-- HEADER -->
+          <div class="review-card-header">
+            <div class="header-left">
+              <img src="https://i.pravatar.cc/40?img=<%= Math.floor(Math.random() * 70) + 1 %>" alt="User" class="review-profile" />
+              <div class="review-user-info">
+                <span class="review-user">
+                  <a class="profile-link" href="/profile/<%= review.author._id %>">@<%= review.author.username %></a>
+                </span>
+                <span class="review-time">
+                  <%= review.created_At.toLocaleString() %>
+                </span>
+              </div>
+            </div>
+
+            <% if (currentUser && review.author._id.equals(currentUser._id)) { %>
+              <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                  <button class="delete-btn"><i class="fa fa-trash"></i></button>
+              </form>
+            <% } %>
+            
+         
+          </div>
+
+
+          <!-- BODY -->
+          <div class="review-card-body">
+            <p class="review-text">
+              <%= review.comment %>
+            </p>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="review-card-footer">
+            <div class="review-stars">
+              <% for (let i = 1; i <= 5; i++) { %>
+                <span class="star <%= i <= review.rating ? 'filled' : '' %>">&#9733;</span>
+              <% } %>
+            </div>
+          </div>
+
+        </div>
+      <% } %>
+    </div>
+  <% } %>
+
+  <!-- Add Review Form -->
+  <% if (currentUser) { %>
+    <form class="add-review-form" method="POST" action="/listings/<%= listing._id %>/reviews">
+      <div class="form-header">
+        <h3 class="reviews-title">Leave a Review</h3>
+        <div class="star-rating-wrapper">
+          <div class="star-rating">
+            <% for (let i = 1; i <= 5; i++) { %>
+              <span class="star" data-value="<%= i %>">&#9733;</span>
+            <% } %>
+          </div>
+          <span class="stars-error"></span>
+        </div>
+      </div>
+      <div class="review-input-wrapper">
+        <input type="text" name="review[comment]" placeholder="Write your review..." class="review-text-input" />
+        <span class="review-error-msg"></span>
+        <input type="hidden" name="review[rating]" class="review-rating" value="0" />
+        <button type="submit" class="review-submit-btn">Post</button>
+      </div>
+    </form>
+  <% } %>
+
+</div>
+
+<div class="listing-map-card">
+  <h3 class="reviews-title">Location Map</h3>
+  <div class="title-border"></div>
+
+  <% if (mapData) { %>
+    <div id="listingMap" data-lat="<%= mapData.lat %>" data-lng="<%= mapData.lng %>" data-label="<%= mapData.label %>"></div>
+  <% } else { %>
+    <div class="no-review">
+      <p>Map unavailable for this location right now.</p>
+    </div>
+  <% } %>
+</div>
+
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  const mapElement = document.getElementById('listingMap');
+
+  if (mapElement) {
+    const lat = Number(mapElement.dataset.lat);
+    const lng = Number(mapElement.dataset.lng);
+    const label = mapElement.dataset.label || 'Listing';
+    const map = L.map('listingMap').setView([lat, lng], 11);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    }).addTo(map);
+
+    const redIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+
+    L.marker([lat, lng], { icon: redIcon })
+      .addTo(map)
+      .bindPopup(label)
+      .openPopup();
+  }
+</script>
+
+
+
+<script src="/js/stars.js"></script>

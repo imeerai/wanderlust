@@ -1,0 +1,71 @@
+<% layout('/layouts/boilerplate') -%>
+<% if (success && success.length> 0) { %>
+  <div class="flash">
+    <%= success %>
+  </div>
+  <% } %>
+    <% if (error && error.length> 0) { %>
+      <div class="erroor">
+        <%= error %>
+      </div>
+      <% } %>
+
+<div class="edit-container">
+  <h3 class="edit-title">Edit Listing</h3>
+
+  <form id="listingForm" class="edit-form" method="POST" action="/listings/<%= listing._id %>?_method=PUT" enctype="multipart/form-data">
+
+    <!-- Row 1 -->
+    <div class="flex-row field-group">
+
+      <div class="field-wrapper">
+        <label for="title">Title</label>
+        <input id="title" name="listing[title]" value="<%= listing.title %>" type="text" />
+        <div class="hellow"></div>
+      </div>
+
+      <div class="field-wrapper">
+        <label for="location">Location</label>
+        <input id="location" name="listing[location]" value="<%= listing.location %>" type="text" />
+        <div class="hellow"></div>
+      </div>
+
+    </div>
+
+    <!-- Description -->
+    <div class="field-wrapper">
+      <label for="desc">Description</label>
+      <textarea id="desc" name="listing[description]"><%= listing.description %></textarea>
+      <div class="hellow"></div>
+    </div>
+
+    <!-- Image -->
+    <div class="field-wrapper">
+      <label for="img">Image</label>
+      <div class="current-image-preview">
+        <img src="<%= ogirlimgaurl %>" alt="Current image for <%= listing.title %>" class="preview-img" />
+      </div>
+      <input id="img" name="listing[image]" type="file" class="file-input" />
+      <div class="hellow"></div>
+    </div>
+    <!-- Row 2 -->
+    <div class="flex-row field-group">
+
+      <div class="field-wrapper">
+        <label for="prize">Prize</label>
+        <input id="prize" name="listing[prize]" value="<%= listing.prize %>" type="number" />
+        <div class="hellow"></div>
+      </div>
+
+      <div class="field-wrapper">
+        <label for="country">Country</label>
+        <input id="country" name="listing[country]" value="<%= listing.country %>" type="text" />
+        <div class="hellow"></div>
+      </div>
+
+    </div>
+
+    <button type="submit" class="edit-btn">Edit Listing</button>
+
+  </form>
+</div>
