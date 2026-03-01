@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/favicon.ico">
+
+</head>
+
+<body>    <% if (error && error.length > 0) { %>
+    <div class="erroor"><%= error %></div>
+  <% } %>
+  
+    <div class="form-container">
+    
+        <h3>Create Account</h3>
+    
+        <form id="authRegisterForm" action="/register" method="POST">
+    
+            <div class="field-wrapper">
+                <label>Username</label>
+                <input type="text" name="user[username]" placeholder="Enter username">
+                <div class="hellow"></div>
+            </div>
+    
+            <div class="field-wrapper">
+                <label>Email</label>
+                <input type="email" name="user[email]" placeholder="Enter email">
+                <div class="hellow"></div>
+            </div>
+    
+            <div class="field-wrapper">
+                <label>Password</label>
+                <input type="password" name="user[password]" placeholder="Enter password">
+                <div class="hellow"></div>
+            </div>
+    
+            <button type="submit">Register</button>
+            <p style="text-align:center; margin-top:10px;">
+                Already have an account?
+                <a href="/login" style="color:#ff5a5f; font-weight:bold;">Login</a>
+            </p>
+        </form>
+    </div>
+
+    <script src="/js/script.js"></script>
+
+</body>
+</html>

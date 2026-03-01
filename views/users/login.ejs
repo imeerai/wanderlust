@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/favicon.ico">
+
+    
+</head>
+<body>
+
+    <% if(error && error.length > 0){ %>
+        <div class="flash erroor"><%= error %></div>
+      <% } %>
+    <div class="form-container">
+        <h3>Login</h3>
+        <form id="authLoginForm" action="/login" method="POST">
+            <div class="field-wrapper">
+                <label for="username">Username </label>
+                <input type="text" name="username" id="username" placeholder="Enter your email" required>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="password">Password</label>
+                <input type="password" name="password" id= "password" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit">Login</button>
+
+            <p style="text-align:center; margin-top:10px;">
+                Don’t have an account?
+                <a href="/register" style="color:#ff5a5f; font-weight:bold;">Register</a>
+            </p>
+        </form>
+    </div>
+
+<script src="js/script.js"></script>
+</body>
+</html>

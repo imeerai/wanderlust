@@ -1,0 +1,216 @@
+<% layout('/layouts/boilerplate') -%>
+
+    <% if (success && success.length> 0) { %>
+        <div class="flash">
+            <%= success %>
+        </div>
+        <% } %>
+            <% if (error && error.length> 0) { %>
+                <div class="erroor">
+                    <%= error %>
+                </div>
+                <% } %>
+                    <div class="form-container profile-wrap">
+
+                        <div class="profile-head-row">
+                            <h3><%= isOwnProfile ? 'My Profile' : '@' + user.username + ' Profile' %></h3>
+                            <% if (isOwnProfile) { %>
+                                <a class="edit-btn profile-new-btn" href="/listings/new">+ New Listing</a>
+                            <% } %>
+                        </div>
+
+                        <!-- PROFILE VIEW -->
+                        <% if (isOwnProfile) { %>
+                        <form id="profileForm" action="/profile/update" method="POST">
+
+                            <!-- USERNAME -->
+                            <div class="field-wrapper">
+                                <label>Username</label>
+                                <input type="text" name="user[username]" value="<%= user.username %>" disabled>
+                                <div class="hellow"></div>
+                            </div>
+
+                            <!-- EMAIL -->
+                            <div class="field-wrapper">
+                                <label>Email</label>
+                                <input type="email" name="user[email]" value="<%= user.email %>" disabled>
+                                <div class="hellow"></div>
+                            </div>
+
+                            <!-- PASSWORD -->
+                            <div class="field-wrapper">
+                                <label>Password</label>
+                                <input type="password" name="user[password]" value="********" disabled>
+                                <div class="hellow"></div>
+                            </div>
+
+                            <!-- BUTTONS -->
+                            <div class="profile-actions-row">
+
+                                <!-- EDIT BUTTON -->
+                                <button type="button" id="editBtn" class="edit-btn" style="background:#ff385c;">
+                                    Edit Profile
+                                </button>
+
+                                <!-- SAVE BUTTON (hidden by default) -->
+                                <button type="submit" id="saveBtn" class="edit-btn"
+                                    style="background:#e03d77; display:none;">
+                                    Save Changes
+                                </button>
+
+                                <!-- DELETE BUTTON -->
+                                <button type="button" id="deleteBtn" class="profile-account-delete">
+                                    Delete Account
+                                </button>
+                            </div>
+
+                        </form>
+                        <% } else { %>
+                            <div class="field-wrapper">
+                                <label>Username</label>
+                                <input type="text" value="<%= user.username %>" disabled>
+                                <div class="hellow"></div>
+                            </div>
+
+                            <div class="field-wrapper">
+                                <label>Email</label>
+                                <input type="email" value="<%= user.email %>" disabled>
+                                <div class="hellow"></div>
+                            </div>
+                        <% } %>
+
+                        <!-- DELETE CONFIRM POPUP -->
+                        <% if (isOwnProfile) { %>
+                            <form id="deleteForm" action="/profile/delete" method="POST" style="display:none;">
+                            </form>
+                        <% } %>
+
+                        <div class="stats-panel">
+                            <h3><%= isOwnProfile ? 'My Stats' : user.username + "'s Stats" %></h3>
+                            <div class="stats-grid">
+                                <div class="stats-card">
+                                    <p class="stats-label">Total Posts</p>
+                                    <h4><%= userStats.postCount %></h4>
+                                </div>
+                                <div class="stats-card">
+                                    <p class="stats-label">Reviews On Posts</p>
+                                    <h4><%= userStats.totalReviewsOnPosts %></h4>
+                                </div>
+                                <div class="stats-card">
+                                    <p class="stats-label">Avg Rating On Posts</p>
+                                    <h4 class="avg-rating-value">
+                                        <%= userStats.averageRatingOnPosts ? userStats.averageRatingOnPosts.toFixed(1) : '0.0' %> ★
+                                        <span class="mini-stars-inline">
+                                            <% const avgRating = Number(userStats.averageRatingOnPosts || 0); %>
+                                            <% for (let i = 1; i <= 5; i++) { %>
+                                                <% let starClass = 'empty'; %>
+                                                <% if (avgRating >= i) { %>
+                                                    <% starClass = 'filled'; %>
+                                                <% } else if (avgRating >= i - 0.5) { %>
+                                                    <% starClass = 'half'; %>
+                                                <% } %>
+                                                <span class="star <%= starClass %>">&#9733;</span>
+                                            <% } %>
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+
+                            <div class="best-review-card">
+                                <h4>Most Reviewed Post By <%= isOwnProfile ? 'Me' : ('@' + user.username) %></h4>
+                                <% if (userStats.mostReviewedPost) { %>
+                                    <div class="top-post-highlight">
+                                        <img src="<%= userStats.mostReviewedPost.imageUrl %>" alt="<%= userStats.mostReviewedPost.title %>">
+                                        <div>
+                                            <p class="best-review-text"><strong><%= userStats.mostReviewedPost.title %></strong></p>
+                                            <p class="best-review-meta">
+                                                <%= userStats.mostReviewedPost.location %> • by @<%= user.username %>
+                                            </p>
+                                            <p class="top-post-badge">🔥 <%= userStats.mostReviewedPost.reviewCount %> reviews</p>
+                                            <a class="stats-open-link" href="/listings/<%= userStats.mostReviewedPost.id %>">Open Listing</a>
+                                        </div>
+                                    </div>
+                                <% } else { %>
+                                    <p class="best-review-text">No reviewed post available yet for this user.</p>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="profile-posts-panel">
+                            <div class="profile-posts-head">
+                                <h3><%= isOwnProfile ? 'My Listings' : user.username + "'s Listings" %></h3>
+                                <% if (isOwnProfile) { %>
+                                    <a class="stats-open-link" href="/listings/new">Add New Listing</a>
+                                <% } %>
+                            </div>
+
+                            <% if (!userListings || userListings.length === 0) { %>
+                                <div class="no-review">
+                                    <p>No listings posted yet.</p>
+                                </div>
+                            <% } else { %>
+                                <div class="profile-listings-grid">
+                                    <% for (let listing of userListings) { %>
+                                        <div class="profile-listing-card">
+                                            <a href="/listings/<%= listing._id %>">
+                                                <img src="<%= listing.image.url %>" alt="<%= listing.title %>">
+                                            </a>
+                                            <div class="profile-listing-info">
+                                                <h4><%= listing.title %></h4>
+                                                <p><%= listing.location %>, <%= listing.country %></p>
+                                                <p class="profile-listing-price">&#8360; <%= Number(listing.prize || 0).toLocaleString('en-PK') %></p>
+                                            </div>
+                                            <div class="profile-listing-actions">
+                                                <a class="stats-open-link" href="/listings/<%= listing._id %>">View</a>
+                                                <% if (isOwnProfile) { %>
+                                                    <a class="stats-open-link" href="/listings/<%= listing._id %>/edit">Edit</a>
+                                                    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+                                                        <button type="submit" class="stats-open-link profile-delete-post">Delete</button>
+                                                    </form>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% } %>
+                        </div>
+
+
+                    </div>
+
+
+                    <script>
+                        // ======================
+                        // ENABLE EDIT MODE
+                        // ======================
+                        const editBtn = document.getElementById("editBtn");
+                        const saveBtn = document.getElementById("saveBtn");
+                        const profileForm = document.getElementById("profileForm");
+
+                        if (editBtn && saveBtn && profileForm) {
+                            editBtn.addEventListener("click", () => {
+                                document.querySelectorAll("#profileForm input").forEach(i => {
+                                    i.disabled = false;
+                                    if (i.name === "user[password]") i.value = "";
+                                });
+
+                                saveBtn.style.display = "block";
+                                editBtn.style.display = "none";
+                            });
+                        }
+
+                        // ======================
+                        // DELETE CONFIRM
+                        // ======================
+                        const deleteBtn = document.getElementById("deleteBtn");
+                        const deleteForm = document.getElementById("deleteForm");
+
+                        if (deleteBtn && deleteForm) {
+                            deleteBtn.addEventListener("click", () => {
+                                let ask = confirm("Are you sure you want to permanently delete your account?");
+                                if (ask) {
+                                    deleteForm.submit();
+                                }
+                            });
+                        }
+                    </script>

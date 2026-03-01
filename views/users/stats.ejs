@@ -1,0 +1,43 @@
+<% layout('/layouts/boilerplate') -%>
+
+<section class="stats-page">
+    <div class="stats-hero">
+        <p class="stats-kicker">Live dashboard</p>
+        <h2>Wanderlust Platform Pulse</h2>
+        <p>Real-time snapshot of community growth and listing engagement.</p>
+    </div>
+
+    <div class="stats-metrics">
+        <article class="metric-card users">
+            <p>Total Users</p>
+            <h3><%= platformStats.totalUsers %></h3>
+        </article>
+        <article class="metric-card listings">
+            <p>Total Listings</p>
+            <h3><%= platformStats.totalListings %></h3>
+        </article>
+        <article class="metric-card reviews">
+            <p>Total Reviews</p>
+            <h3><%= platformStats.totalReviews %></h3>
+        </article>
+    </div>
+
+    <div class="stats-focus">
+        <h3>Most Reviewed Post</h3>
+        <% if (platformStats.topReviewedListing) { %>
+            <div class="focus-card">
+                <img src="<%= platformStats.topReviewedListing.imageUrl %>" alt="<%= platformStats.topReviewedListing.title %>">
+                <div class="focus-content">
+                    <h4><%= platformStats.topReviewedListing.title %></h4>
+                    <p><%= platformStats.topReviewedListing.location %> • by @<%= platformStats.topReviewedListing.owner %></p>
+                    <div class="focus-actions">
+                        <span class="top-post-badge">🔥 <%= platformStats.topReviewedListing.reviewCount %> reviews</span>
+                        <a class="stats-open-link" href="/listings/<%= platformStats.topReviewedListing.id %>">View Post</a>
+                    </div>
+                </div>
+            </div>
+        <% } else { %>
+            <p class="best-review-text">No reviewed listing available yet.</p>
+        <% } %>
+    </div>
+</section>
