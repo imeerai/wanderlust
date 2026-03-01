@@ -29,9 +29,10 @@ const reviewsRouter = require("./routes/reviews");
 const userRouter = require("./routes/users");
 
 const PORT = process.env.PORT || 8000;
+const mongoURL = process.env.ATLAS_URI?.trim();
+const sessionSecret = (process.env.SCREAT || process.env.SECRET || "").trim();
 
 // ==================== DATABASE ====================
-const mongoURL = process.env.ATLAS_URI;
 let dbConnectPromise = null;
 
 const connectDB = async () => {
@@ -39,7 +40,7 @@ const connectDB = async () => {
   if (mongoose.connection.readyState === 1) return;
   if (!dbConnectPromise) {
     dbConnectPromise = mongoose
-      .connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true })
+      .connect(mongoURL, { serverSelectionTimeoutMS: 10000 })
       .then(() => {
         console.log("Connected to DB");
       })
@@ -54,7 +55,9 @@ const connectDB = async () => {
   await dbConnectPromise;
 };
 
-connectDB();
+connectDB().catch((err) => {
+  console.log("❌ Initial MongoDB connect failed:", err?.message || err);
+});
 
 // ==================== VIEW ENGINE ====================
 app.engine("ejs", ejsMate);
@@ -67,21 +70,26 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ==================== SESSION STORE ===================
-const store = MongoStore.create({
-  mongoUrl: mongoURL,
-  crypto: {
-    secret: process.env.SCREAT,
-  },
-  touchAfter: 24 * 60 * 60,
-});
+let store;
+if (mongoURL && sessionSecret) {
+  store = MongoStore.create({
+    clientPromise: connectDB().then(() => mongoose.connection.getClient()),
+    crypto: {
+      secret: sessionSecret,
+    },
+    touchAfter: 24 * 60 * 60,
+  });
 
-store.on("error", (e) => {
-  console.log("❌ SESSION STORE ERROR", e);
-});
+  store.on("error", (e) => {
+    console.log("❌ SESSION STORE ERROR", e);
+  });
+} else {
+  console.log("⚠️ Mongo session store disabled (missing ATLAS_URI or SCREAT/SECRET)");
+}
 
 // ==================== SESSION CONFIG ====================
 const sessionOption = {
-  secret: process.env.SCREAT,
+  secret: sessionSecret || "fallback-session-secret",
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -92,12 +100,17 @@ const sessionOption = {
 };
 
 if (process.env.NODE_ENV === "production") {
+  if (!sessionSecret) {
+    throw new Error("Missing SCREAT or SECRET in production environment variables");
+  }
   app.set("trust proxy", 1);
   sessionOption.cookie.secure = true;
   sessionOption.cookie.sameSite = "lax";
 }
 
-sessionOption.store = store;
+if (store) {
+  sessionOption.store = store;
+}
 app.use(session(sessionOption));
 app.use(flash());
 
