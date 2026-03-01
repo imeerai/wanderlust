@@ -50,7 +50,7 @@ npm run seed
 
 Update after deploy:
 
-**Live App:** https://your-project-name.vercel.app
+**Live App:** [https://wanderlust.vercel.app](https://wanderlust-imeer.vercel.app/)
 
 ## Health Endpoint
 
