@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error <%= status %>
+  </title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+<style>
+  /* ======= ERROR CARD ======= */
+  .error-card {
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 12px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    margin: 50px auto;
+    animation: fadeIn 0.5s ease-out;
+    z-index: 99;
+  }
+
+  .error-card h1 {
+    font-size: 64px;
+    font-weight: 700;
+    margin-bottom: 32px;
+    color: #FF5A5F;
+    border-bottom: 2px solid #33333376;
+  }
+  .error-card p {
+    font-size: 16px;
+    margin-bottom: 30px;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  .error-card .btn {
+    padding: 12px 28px;
+    margin: 5px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .error-card .btn-home {
+    background-color: #FF5A5F;
+    color: white;
+  }
+
+  .error-card .btn-home:hover {
+    background-color: #e14c50;
+    transform: scale(1.05);
+  }
+
+  .error-card .btn-back {
+    background-color: #000;
+    color: white;
+  }
+
+  .error-card .btn-back:hover {
+    background-color: #222;
+    transform: scale(1.05);
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .okk{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+  /* Mobile responsiveness */
+  @media screen and (max-width: 767px) {
+    .error-card {
+      padding: 30px 20px;
+    }
+
+    .error-card h1 {
+      font-size: 48px;
+    }
+
+    .error-card p {
+      font-size: 16px;
+    }
+
+    .error-card .btn {
+      width: 100%;
+      margin: 8px 0;
+    }
+  }
+</style>
+
+<body>
+ <div class="hero">
+  <div class="error-card">
+    <h1>Error
+      <%= status %>
+    </h1>
+ 
+    <p>
+      <%= message %>
+    </p>
+<div class="okk">
+  <button class="btn btn-home" onclick="window.location.href='/'">Home</button>
+  <button class="btn btn-back" onclick="history.back()">Try Again</button>
+
+</div>
+  </div>
+ </div>
+
+  <script>
+    function goHome() {
+      window.location.href = '/';
+    }
+
+    function tryAgain() {
+      window.location.reload();
+    }
+  </script>
+
+
+</body>
+
+</html>
