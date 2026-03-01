@@ -1,0 +1,71 @@
+<header class="site-header">
+    <div class="logo">
+        <a href="#" onclick="location.reload(); return false;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Airbnb_Logo_B%C3%A9lo.svg"
+                alt="Airbnb Logo"></a>
+    </div>
+
+    <ul class="nav-links">
+        <li class="home"><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/stats">Stats</a></li>
+        <li class="listings"><a href="/listings">Listings</a></li>
+        <li><a href="/listings/new">Add New Listing</a></li>
+    </ul>
+
+    <div class="right-actions">
+        <% if (!currentUser) { %>
+            <a class="btn primary" href="/register">Register</a>
+            <a class="btn btn-outline" href="/login">Login</a>
+            <% } else { %>
+                <div class="dropdown">
+                    <div class="dropdown-btn" id="profileToggle">
+                        <span>
+                            <%= currentUser.username %>
+                        </span>
+                        <img src="https://i.pravatar.cc/40?img=<%= Math.floor(Math.random() * 70) + 1 %>" alt="User" />
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="/profile">View Profile</a>
+                        <form action="/logout" method="GET"><button type="submit">Logout</button></form>
+                    </div>
+                </div>
+                <% } %>
+
+                    <div class="mobile-menu" id="mobileMenuBtn">
+                        <i class="fa-solid fa-bars"></i>
+                    </div>
+    </div>
+</header>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+    <div class="menu-items">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/stats">Stats</a>
+        <a href="/listings">Listings</a>
+        <a href="/listings/new">Add New Listing</a>
+    </div>
+
+    <div class="bottom-actions">
+        <% if (currentUser) { %>
+            <a href="/profile">View Profile</a>
+            <form action="/logout" method="GET"><button type="submit" style="
+            background: #FF385C;
+            color: white;
+        " class="btn">Logout</button></form>
+            <% } else { %>
+                <a href="/register" style="
+                background: #FF385C;
+                color: white;
+            " class="btn">Register</a>
+                <a href="/login" style="
+                color: #333;
+                background: white; 
+                border: 1px solid #ccc;
+
+            " class="btn">Login</a>
+                <% } %>
+    </div>
+</div>
