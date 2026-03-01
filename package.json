@@ -1,0 +1,47 @@
+{
+	"engines": {
+		"node": "22.18.0"
+	},
+	"name": "majorproject",
+	"version": "1.0.0",
+	"description": "my first project full stack web dev based",
+	"main": "app.js",
+	"scripts": {
+		"start": "node app.js",
+		"start:clean": "fuser -k 8000/tcp || true && node app.js",
+		"seed": "node init/index.js",
+		"dev": "fuser -k 8000/tcp || true && npx nodemon app.js",
+		"devStart": "nodemon app.js"
+	},
+	"keywords": [],
+	"author": "imeer.ai",
+	"license": "ISC",
+	"dependencies": {
+		"@mapbox/mapbox-sdk": "^0.16.2",
+		"bcrypt": "^6.0.0",
+		"cloudinary": "^2.9.0",
+		"connect-flash": "^0.1.1",
+		"connect-mongo": "^6.0.0",
+		"cookie-parser": "^1.4.7",
+		"dotenv": "^17.3.1",
+		"ejs": "^3.1.10",
+		"ejs-mate": "^4.0.0",
+		"express": "^4.21.2",
+		"express-session": "^1.19.0",
+		"joi": "^18.0.2",
+		"method-override": "^3.0.0",
+		"mongodb": "^7.1.0",
+		"mongoose": "^6.13.9",
+		"multer": "^2.1.0",
+		"multer-storage-cloudinary": "^2.2.1",
+		"passport": "^0.7.0",
+		"passport-local": "^1.0.0",
+		"passport-local-mongoose": "^7.1.2"
+	},
+	"devDependencies": {
+		"nodemon": "^3.1.10"
+	},
+	"overrides": {
+		"fast-xml-parser": "^5.3.8"
+	}
+}
