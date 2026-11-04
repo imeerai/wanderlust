@@ -1,0 +1,36 @@
+<%
+  const f_host = (typeof isHost !== 'undefined') && isHost;
+  const f_user = (typeof currentUser !== 'undefined') && currentUser;
+%>
+<footer class="wl-footer">
+  <div class="wl-fin">
+    <div class="wl-fcols">
+      <div class="wl-fbrand">
+        <a class="wl-flogo" href="/" aria-label="Wanderlust home">
+          <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#e61e4d"/><path d="M7 11l4.2 11 4.8-8 4.8 8L25 11" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          wanderlust
+        </a>
+        <p>Homes, villas and farm stays across Pakistan, priced per night.</p>
+      </div>
+      <nav aria-label="Explore"><b>Explore</b>
+        <a href="/listings">All stays</a>
+        <a href="/wishlist">Wishlists</a>
+        <a href="/stats">Platform stats</a>
+      </nav>
+      <nav aria-label="Hosting"><b>Hosting</b>
+        <a href="<%= f_user ? '/listings/new' : '/login' %>">Add a listing</a>
+        <% if (f_host) { %><a href="/profile">My listings</a><% } %>
+        <% if (f_user) { %><a href="/profile">My profile</a><% } else { %><a href="/register">Create an account</a><% } %>
+      </nav>
+      <nav aria-label="Wanderlust"><b>Wanderlust</b>
+        <a href="/about">About</a>
+        <a href="https://github.com/imeerai" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+    </div>
+    <div class="wl-fbot">
+      <span>&copy; 2026 Wanderlust &middot; Built by <a href="https://github.com/imeerai" target="_blank" rel="noopener noreferrer" style="text-decoration:underline">imeer.ai</a></span>
+      <span><span>English (PK)</span><span>Rs PKR</span></span>
+    </div>
+  </div>
+</footer>
+<div class="wl-toast" id="wlToast" role="status" hidden></div>

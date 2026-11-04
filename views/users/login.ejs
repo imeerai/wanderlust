@@ -1,0 +1,40 @@
+<% layout('/layouts/auth') -%>
+<%
+  const flashErr = (typeof error !== 'undefined' && error) ? [].concat(error) : [];
+  const okList = (typeof success !== 'undefined' && success) ? [].concat(success) : [];
+  const F = (typeof fields !== 'undefined' && fields) ? fields : {};
+  const V = (typeof values !== 'undefined' && values) ? values : {};
+  const errList = flashErr.concat(typeof formError !== 'undefined' && formError ? [formError] : []);
+%>
+<div class="wl-auth">
+  <%- include('../includes/authHero', { hero, headline: 'Your next stay is one login away.', sub: 'Save favourites, review stays and host your own place.' }) %>
+  <section class="wl-auth-form">
+    <form id="loginForm" action="/login" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div><h1>Welcome back</h1><p class="lead">Log in to continue to Wanderlust.</p></div>
+
+      <div id="formAlert">
+      <% okList.forEach(m => { %><div class="wl-alert ok" role="status"><%= m %></div><% }) %>
+      <% errList.forEach(m => { %><div class="wl-alert" role="alert"><%= m %></div><% }) %>
+      </div>
+
+      <label class="wl-field">Username
+        <input name="username" type="text" value="<%= V.username || '' %>" placeholder="e.g. ali_raza" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="100" aria-invalid="<%= F.username ? 'true' : 'false' %>" data-req="Enter your username" required <%= V.username ? '' : 'autofocus' %>>
+        <span class="msg <%= F.username ? 'bad' : '' %>" data-msg="username"><%= F.username || '' %></span>
+      </label>
+      <label class="wl-field">Password
+        <span class="pw">
+          <input name="password" type="password" placeholder="Enter password" autocomplete="current-password" maxlength="128" aria-invalid="<%= F.password ? 'true' : 'false' %>" data-req="Enter your password" required <%= V.username ? 'autofocus' : '' %>>
+          <button type="button" data-pw-toggle aria-label="Show or hide password">Show</button>
+        </span>
+        <span class="msg <%= F.password ? 'bad' : '' %>" data-msg="password"><%= F.password || '' %></span>
+        <span class="msg caps" data-caps hidden>Caps Lock is on</span>
+      </label>
+
+      <button type="submit" class="wl-cta">Log in</button>
+      <div class="wl-or"><span></span>or<span></span></div>
+      <a class="wl-ghost" href="/listings">Continue as guest</a>
+      <p class="alt">Don't have an account? <a href="/register">Sign up</a></p>
+    </form>
+  </section>
+</div>

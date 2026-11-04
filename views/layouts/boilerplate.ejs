@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <%
+    const SU = typeof siteUrl !== 'undefined' ? siteUrl : '';
+    const fullTitle = (typeof pageTitle !== 'undefined' && pageTitle) ? pageTitle + ' | Wanderlust' : 'Wanderlust | Homes, villas and farm stays across Pakistan';
+    const desc = (typeof metaDesc !== 'undefined' && metaDesc) ? metaDesc : 'Book homes, villas, city apartments and farm stays across Pakistan. Real photos, honest reviews, and prices per night with GST shown upfront.';
+    const ogImg = (typeof metaImage !== 'undefined' && metaImage) ? metaImage : SU + '/images/og.png';
+    const CP = typeof canonicalPath !== 'undefined' ? canonicalPath : '/';
+    const NI = typeof noindex !== 'undefined' && noindex;
+    const canon = SU + CP;
+  %>
+  <title><%= fullTitle %></title>
+  <meta name="description" content="<%= desc %>">
+  <link rel="canonical" href="<%= canon %>">
+  <meta name="robots" content="<%= NI ? 'noindex, nofollow' : 'index, follow, max-image-preview:large' %>">
+  <meta name="theme-color" content="#e61e4d">
+  <meta property="og:site_name" content="Wanderlust">
+  <meta property="og:type" content="<%= (typeof ogType !== 'undefined' && ogType) ? ogType : 'website' %>">
+  <meta property="og:title" content="<%= fullTitle %>">
+  <meta property="og:description" content="<%= desc %>">
+  <meta property="og:url" content="<%= canon %>">
+  <meta property="og:image" content="<%= ogImg %>">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= fullTitle %>">
+  <meta name="twitter:description" content="<%= desc %>">
+  <meta name="twitter:image" content="<%= ogImg %>">
+  <% if (typeof jsonLd !== 'undefined' && jsonLd) { %><script type="application/ld+json" nonce="<%= nonce %>"><%- jsonLd %></script><% } %>
+  <meta name="csrf-token" content="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+  <link rel="icon" href="/images/favicon.ico">
+  <script nonce="<%= nonce %>">try{var t=localStorage.getItem("wl-theme");if(t==="dark")document.documentElement.setAttribute("data-theme","dark")}catch(e){}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/wl.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body class="wl">
+  <a class="wl-skip" href="#main">Skip to content</a>
+  <%- include('../includes/navbar') %>
+  <% const isWide = (typeof wide !== 'undefined' && wide); %>
+  <%- include("../includes/flash") %>
+  <main id="main" class="wl-main <%= isWide ? '' : 'container' %>">
+    <%- body %>
+  </main>
+  <%- include('../includes/footer') %>
+
+  <script src="/js/wl.js" defer></script>
+  <script src="/js/script.js"></script>
+</body>
+
+</html>

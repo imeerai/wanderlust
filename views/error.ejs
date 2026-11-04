@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= status %> | Wanderlust</title>
+  <link rel="icon" href="/images/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;flex-direction:column;font-family:'Figtree',system-ui,sans-serif;color:#222;background:#fff}
+    header{padding:20px 48px}
+    .brand{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#e61e4d;font-weight:800;font-size:24px;letter-spacing:-.8px}
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px 72px}
+    .card{width:100%;max-width:520px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+    .code{font-size:96px;font-weight:800;letter-spacing:-4px;line-height:1;background:linear-gradient(90deg,#e61e4d,#d70466);-webkit-background-clip:text;background-clip:text;color:transparent}
+    h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-.6px}
+    p{margin:0;color:#6a6a6a;font-size:17px;line-height:1.6;max-width:440px}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 28px;border-radius:12px;font:700 16px 'Figtree',system-ui,sans-serif;text-decoration:none;cursor:pointer;border:1px solid #222;background:#fff;color:#222}
+    .btn.primary{border:0;color:#fff;background:linear-gradient(90deg,#e61e4d,#d70466)}
+    .btn:hover{opacity:.9}
+    .btn:focus-visible{outline:3px solid #222;outline-offset:2px}
+    footer{padding:20px 48px;border-top:1px solid #ebebeb;color:#6a6a6a;font-size:14px}
+    @media (max-width:600px){header,footer{padding-left:16px;padding-right:16px}.code{font-size:72px}.btn{width:100%}}
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">
+      <svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#e61e4d"/><path d="M7 11l4.2 11 4.8-8 4.8 8L25 11" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      wanderlust
+    </a>
+  </header>
+  <main>
+    <section class="card" role="alert">
+      <div class="code"><%= status %></div>
+      <h1><%= typeof title !== "undefined" ? title : "Something went wrong" %></h1>
+      <p><%= message %></p>
+      <div class="actions">
+        <a class="btn primary" href="/listings">Browse stays</a>
+        <a class="btn" href="/">Go home</a>
+        <% if (status === 401 || status === 403) { %><a class="btn" href="/login">Log in</a><% } %>
+      </div>
+    </section>
+  </main>
+  <footer>© 2026 Wanderlust</footer>
+</body>
+</html>

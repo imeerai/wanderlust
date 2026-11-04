@@ -1,0 +1,113 @@
+<%
+  const here = (typeof navPath !== 'undefined') ? navPath : '/';
+  const sel = (typeof selectedFilters !== 'undefined' && selectedFilters) ? selectedFilters : {};
+  // The search bar is on every browsing page; the listing forms keep a plain header.
+  const showSearch = !(/^\/listings\/new\/?$/.test(here) || /^\/listings\/[^/]+\/edit\/?$/.test(here));
+  const dests = (typeof suggest !== 'undefined' && suggest && suggest.length) ? suggest : [
+    { name: 'Swat', count: 0, image: '' }, { name: 'Hunza', count: 0, image: '' },
+    { name: 'Murree', count: 0, image: '' }, { name: 'Karachi', count: 0, image: '' } ];
+  const wlCount = (typeof wishlistIds !== 'undefined') ? wishlistIds.length : 0;
+  const host = (typeof isHost !== 'undefined') && isHost;
+  const hostHref = !currentUser ? '/login' : (host ? '/profile' : '/listings/new');
+  const hostLabel = host ? 'My listings' : 'Become a host';
+%>
+<header class="wl-header" id="wlHeader">
+  <div class="wl-r1">
+    <a class="wl-logo" href="/" aria-label="Wanderlust home">
+      <svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#e61e4d"/><path d="M7 11l4.2 11 4.8-8 4.8 8L25 11" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>wanderlust</span>
+    </a>
+
+    <% if (showSearch) { %>
+    <form class="wl-pill" id="wlPill" action="/listings" method="GET" role="search" autocomplete="off">
+      <label class="wl-seg" data-seg="where">
+        <span class="k">Where</span>
+        <input type="text" name="location" id="wlWhere" maxlength="80" placeholder="Anywhere" value="<%= sel.location || '' %>">
+      </label>
+      <span class="wl-vr"></span>
+      <button type="button" class="wl-seg" data-seg="when" aria-expanded="false" aria-controls="wlPWhen">
+        <span class="k">When</span><span class="v" id="wlWhenTxt">Add dates</span>
+      </button>
+      <span class="wl-vr"></span>
+      <button type="button" class="wl-seg" data-seg="who" aria-expanded="false" aria-controls="wlPWho">
+        <span class="k">Who</span><span class="v" id="wlWhoTxt">Add guests</span>
+      </button>
+      <input type="hidden" name="checkIn" id="wlIn"><input type="hidden" name="checkOut" id="wlOut"><input type="hidden" name="guests" id="wlGuests">
+      <button type="submit" class="wl-go" aria-label="Search stays">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Search</span>
+      </button>
+
+      <div class="wl-panel wl-p-where" id="wlPWhere" hidden>
+        <div class="wl-ph">Suggested destinations</div>
+        <% dests.forEach(d => { %>
+          <button type="button" class="wl-opt" data-place="<%= d.name %>">
+            <% if (d.image) { %><img src="<%= d.image %>" alt="" loading="lazy"><% } else { %><span class="ph"></span><% } %>
+            <span><b><%= d.name %></b><span><%= d.count ? d.count + (d.count === 1 ? ' stay' : ' stays') : 'Popular destination' %></span></span>
+          </button>
+        <% }) %>
+      </div>
+
+      <div class="wl-panel wl-p-when" id="wlPWhen" hidden>
+        <div class="wl-cal-h"><button type="button" id="wlPrev" aria-label="Previous month">&lsaquo;</button><span id="wlMonth"></span><button type="button" id="wlNext" aria-label="Next month">&rsaquo;</button></div>
+        <div class="wl-cal-w"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+        <div class="wl-cal-g" id="wlCal"></div>
+      </div>
+
+      <div class="wl-panel wl-p-who" id="wlPWho" hidden>
+        <div class="wl-gr"><div><b>Adults</b><span class="s">Ages 13 or above</span></div>
+          <div class="wl-step"><button type="button" data-g="adults" data-d="-1" aria-label="Fewer adults">&minus;</button><output id="wlAdults">0</output><button type="button" data-g="adults" data-d="1" aria-label="More adults">+</button></div></div>
+        <div class="wl-gr"><div><b>Children</b><span class="s">Ages 2 to 12</span></div>
+          <div class="wl-step"><button type="button" data-g="children" data-d="-1" aria-label="Fewer children">&minus;</button><output id="wlChildren">0</output><button type="button" data-g="children" data-d="1" aria-label="More children">+</button></div></div>
+      </div>
+    </form>
+    <% } %>
+
+    <div class="wl-actions">
+      <a class="wl-host" href="<%= hostHref %>"><%= hostLabel %></a>
+      <button type="button" class="wl-acct" id="wlAcctBtn" aria-haspopup="true" aria-expanded="false" aria-controls="wlMenu" aria-label="Account menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <span class="wl-avatar" aria-hidden="true"><% if (currentUser) { %><%= currentUser.username.charAt(0) %><% } else { %><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg><% } %></span>
+      </button>
+      <div class="wl-menu" id="wlMenu" hidden>
+        <% if (currentUser) { %>
+          <div class="wl-who">Signed in as <b>@<%= currentUser.username %></b></div>
+          <a href="/profile">My profile</a>
+          <a href="/wishlist">Wishlists<span class="wl-count" id="wlCount" <%= wlCount ? '' : 'hidden' %>><%= wlCount %></span></a>
+          <a href="<%= hostHref %>"><%= host ? 'Add another listing' : 'Become a host' %></a>
+        <% } else { %>
+          <a href="/login" style="font-weight:800">Log in</a>
+          <a href="/register">Sign up</a>
+          <a href="/wishlist">Wishlists</a>
+        <% } %>
+        <hr>
+        <button type="button" class="mi wl-sw" role="switch" aria-checked="false" id="wlDark">Dark mode <i></i></button>
+        <% if (currentUser) { %>
+          <form action="/logout" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="mi">Log out</button>
+          </form>
+        <% } %>
+      </div>
+      <button type="button" class="wl-burger" id="wlBurger" aria-label="Open menu" aria-controls="wlDrawer" aria-expanded="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="wl-drawer" id="wlDrawer" hidden>
+  <nav aria-label="Mobile">
+    <button type="button" class="close" id="wlDrawerClose" aria-label="Close menu">&times;</button>
+    <a href="/">Home</a>
+    <a href="/listings">All stays</a>
+    <a href="/wishlist">Wishlists</a>
+    <a href="<%= hostHref %>"><%= hostLabel %></a>
+    <% if (currentUser) { %>
+      <a href="/profile">My profile</a>
+      <form action="/logout" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit">Log out</button></form>
+    <% } else { %>
+      <a href="/login">Log in</a>
+      <a href="/register">Sign up</a>
+    <% } %>
+  </nav>
+</div>

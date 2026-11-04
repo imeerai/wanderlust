@@ -1,0 +1,152 @@
+<% layout('/layouts/boilerplate') -%>
+<%
+  const initial = (profile.username || '?').charAt(0).toUpperCase();
+  const avg = stats.average ? stats.average.toFixed(1) : '-';
+  const upcoming = trips.filter(t => t.upcoming);
+  const earlier = trips.filter(t => !t.upcoming);
+%>
+<div class="wl-prof">
+  <!-- LEFT: ACCOUNT -->
+  <aside class="wl-prof-side">
+    <div class="wl-prof-card">
+      <span class="wl-prof-av"><%= initial %></span>
+      <h1>@<%= profile.username %></h1>
+      <span class="since">Member since <%= profile.since %></span>
+      <div class="nums">
+        <div><b><%= stats.posts %></b><span>Listings</span></div>
+        <div><b><%= stats.reviews %></b><span>Reviews</span></div>
+        <div><b><%= avg %><% if (stats.average) { %> &#9733;<% } %></b><span>Rating</span></div>
+      </div>
+    </div>
+
+    <% if (isOwnProfile) { %>
+    <form class="wl-prof-form" id="acctForm" action="/profile/update" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <b>Account details</b>
+      <label>Username<input value="<%= profile.username %>" disabled></label>
+      <label>Email<input type="email" name="user[email]" value="<%= profile.email %>" maxlength="254" autocomplete="email" data-edit disabled></label>
+      <label>Password<input type="password" name="user[password]" value="" placeholder="********" maxlength="128" autocomplete="new-password" data-edit disabled></label>
+      <p class="hint" data-edit-only hidden>Leave the password blank to keep it. Passwords need 8+ characters with letters, a number and a symbol.</p>
+      <label data-edit-only hidden>Current password<input type="password" name="user[current]" maxlength="128" autocomplete="current-password" data-edit disabled placeholder="Needed to save changes"></label>
+      <div class="row">
+        <button type="button" class="dark" id="editBtn">Edit profile</button>
+        <button type="button" class="danger" data-open="wlDelAcct" aria-haspopup="dialog">Delete account</button>
+      </div>
+    </form>
+    <% } %>
+  </aside>
+
+  <!-- RIGHT -->
+  <div class="wl-prof-main">
+    <div class="wl-prof-top">
+      <h2><%= isOwnProfile ? 'My profile' : '@' + profile.username %></h2>
+      <% if (isOwnProfile) { %><a class="wl-prof-new" href="/listings/new">+ New listing</a><% } %>
+    </div>
+
+    <section class="wl-prof-sec">
+      <h3><%= isOwnProfile ? 'My stats' : 'Stats' %></h3>
+      <div class="wl-prof-stats">
+        <div><span>Total posts</span><b><%= stats.posts %></b></div>
+        <div><span>Reviews on posts</span><b><%= stats.reviews %></b></div>
+        <div><span>Avg rating</span><b><%= avg %><% if (stats.average) { %> <svg width="26" height="26" viewBox="0 0 24 24" fill="#e61e4d" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><% } %></b></div>
+      </div>
+      <% if (stats.top) { %>
+      <a class="wl-prof-top1" href="/listings/<%= stats.top.id %>">
+        <% if (stats.top.imageUrl) { %><img src="<%= stats.top.imageUrl %>" alt="<%= stats.top.title %>" width="140" height="100"><% } %>
+        <div><span class="k">MOST REVIEWED POST</span><b><%= stats.top.title %></b><small><%= stats.top.location %> &middot; <%= stats.top.reviewCount %> <%= stats.top.reviewCount === 1 ? 'review' : 'reviews' %></small></div>
+        <span class="pill">Open listing</span>
+      </a>
+      <% } %>
+    </section>
+
+    <% if (isOwnProfile) { %>
+    <section class="wl-prof-sec" id="trips">
+      <h3>My trips</h3>
+      <% if (!trips.length) { %>
+        <div class="wl-empty">No trips yet. <a href="/listings" style="font-weight:700;text-decoration:underline">Find a stay</a></div>
+      <% } %>
+      <% [['Upcoming', upcoming], ['Earlier', earlier]].forEach(([label, list]) => { if (!list.length) return; %>
+        <div class="wl-trips-l"><span class="k"><%= label %></span>
+        <% list.forEach(t => { %>
+          <div class="wl-trip <%= t.status === 'cancelled' ? 'off' : '' %>">
+            <a href="/listings/<%= t.listingId %>"><% if (t.image) { %><img src="<%= t.image %>" alt="<%= t.title %>" width="96" height="72" loading="lazy"><% } else { %><span class="noimg"></span><% } %></a>
+            <div class="i">
+              <b><%= t.title %></b>
+              <span><%= t.location %><% if (t.location) { %> &middot; <% } %><%= t.range %></span>
+              <span><%= t.nights %> <%= t.nights === 1 ? 'night' : 'nights' %> &middot; <%= t.guests %> <%= t.guests === 1 ? 'guest' : 'guests' %> &middot; Rs <%= t.total %> incl. GST</span>
+            </div>
+            <% if (t.status === 'cancelled') { %><span class="tag">Cancelled</span>
+            <% } else if (t.canCancel) { %>
+              <button type="button" class="wl-trip-x" data-cancel="<%= t.id %>" data-title="<%= t.title %>">Cancel</button>
+            <% } else { %><span class="tag ok"><%= t.upcoming ? 'Confirmed' : 'Completed' %></span><% } %>
+          </div>
+        <% }) %>
+        </div>
+      <% }) %>
+    </section>
+    <% } %>
+
+    <section class="wl-prof-sec">
+      <h3><%= isOwnProfile ? 'My listings' : 'Listings' %></h3>
+      <% if (!listings.length) { %>
+        <div class="wl-empty"><%= isOwnProfile ? 'You have not listed a place yet.' : 'No listings yet.' %><% if (isOwnProfile) { %> <a href="/listings/new" style="font-weight:700;text-decoration:underline">Add your first listing</a><% } %></div>
+      <% } else { %>
+      <div class="wl-prof-grid">
+        <% listings.forEach(l => { %>
+        <div class="wl-prof-lc">
+          <a class="im" href="/listings/<%= l.id %>"><% if (l.image) { %><img src="<%= l.image %>" alt="<%= l.title %>" loading="lazy" width="300" height="300"><% } %></a>
+          <div class="tx"><b><%= l.title %></b><span><%= l.location %><% if (l.location) { %>, <% } %>Pakistan</span><span><b>Rs <%= l.price %></b></span></div>
+          <div class="act">
+            <a href="/listings/<%= l.id %>">View</a>
+            <% if (isOwnProfile) { %>
+              <a href="/listings/<%= l.id %>/edit">Edit</a>
+              <button type="button" data-del-listing="<%= l.id %>" data-title="<%= l.title %>">Delete</button>
+            <% } %>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <% } %>
+    </section>
+  </div>
+</div>
+
+<% if (isOwnProfile) { %>
+<!-- DELETE ACCOUNT -->
+<div class="wl-modal" id="wlDelAcct" hidden>
+  <div class="wl-modal-box wl-confirm" role="alertdialog" aria-labelledby="delAcctT">
+    <form action="/profile/delete" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <h3 id="delAcctT">Delete your account?</h3>
+      <p>This will permanently remove your profile, all your listings, your trips and the reviews you wrote. This can't be undone.</p>
+      <label>Enter your password to confirm<input type="password" name="password" maxlength="128" autocomplete="current-password" required></label>
+      <div class="btns"><button type="button" class="keep" data-close>Keep account</button><button type="submit" class="go">Yes, delete</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- DELETE LISTING -->
+<div class="wl-modal" id="wlDelListing" hidden>
+  <div class="wl-modal-box wl-confirm" role="alertdialog" aria-labelledby="delListT">
+    <form id="delListingForm" method="POST" action="">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <h3 id="delListT">Delete this listing?</h3>
+      <p><b id="delListName"></b> and its reviews and bookings will be removed for good.</p>
+      <div class="btns"><button type="button" class="keep" data-close>Keep listing</button><button type="submit" class="go">Yes, delete</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- CANCEL TRIP -->
+<div class="wl-modal" id="wlCancelTrip" hidden>
+  <div class="wl-modal-box wl-confirm" role="alertdialog" aria-labelledby="cancelT">
+    <form id="cancelTripForm" method="POST" action="">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <h3 id="cancelT">Cancel this booking?</h3>
+      <p>Your stay at <b id="cancelName"></b> will be cancelled and the dates open up again.</p>
+      <div class="btns"><button type="button" class="keep" data-close>Keep booking</button><button type="submit" class="go">Yes, cancel</button></div>
+    </form>
+  </div>
+</div>
+<% } %>
+<script src="/js/profile.js" defer></script>

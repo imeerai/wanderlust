@@ -1,0 +1,137 @@
+<% layout('/layouts/boilerplate') -%>
+<div class="wl-page">
+
+  <!-- HERO BANNER -->
+  <section class="wl-hero" aria-labelledby="heroTitle">
+    <% if (heroImage) { %><img src="<%= heroImage %>" alt=""><% } %>
+    <div class="wl-hero-t">
+      <span class="wl-eyebrow">STAYS ACROSS PAKISTAN</span>
+      <h1 id="heroTitle">Find a stay that feels like home.</h1>
+      <p>From Swat valley villas to Karachi penthouses. Real photos and honest reviews from guests who stayed.</p>
+      <div class="wl-hero-b">
+        <a class="wl-btn primary" href="/listings">Browse all stays</a>
+        <a class="wl-btn white" href="/listings/new">Host your place</a>
+      </div>
+    </div>
+    <% if (featured) { %>
+    <a class="wl-hero-card" href="/listings/<%= featured.id %>">
+      <% if (featured.image) { %><img src="<%= featured.image %>" alt="<%= featured.title %>"><% } %>
+      <div><small>GUEST FAVOURITE OF THE WEEK</small><b><%= featured.title %><% if (featured.location && featured.title.indexOf(featured.location) === -1) { %> in <%= featured.location %><% } %></b>
+        <span><% if (featured.rating.count) { %>&#9733; <%= featured.rating.average.toFixed(1) %> &middot; <% } %>Rs <span data-price="<%= featured.price %>" data-bare><%= featured.priceText %></span> / night</span></div>
+    </a>
+    <% } %>
+  </section>
+
+  <!-- CATEGORY STRIP -->
+  <div class="wl-catbar">
+    <div class="wl-cats" role="tablist" aria-label="Stay types">
+      <% categories.forEach(c => { %>
+        <a class="wl-cat" href="/?cat=<%= encodeURIComponent(c.key) %>" aria-current="<%= c.key === activeCat ? 'true' : 'false' %>">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="<%= c.path %>"/></svg><%= c.key %>
+        </a>
+      <% }) %>
+    </div>
+    <label class="wl-catsel">
+      <span class="wl-sr">Stay type</span>
+      <select data-cat-select aria-label="Stay type">
+        <% categories.forEach(c => { %><option value="/?cat=<%= encodeURIComponent(c.key) %>" <%= c.key === activeCat ? 'selected' : '' %>><%= c.key %></option><% }) %>
+      </select>
+    </label>
+    <a class="wl-fbtn" href="/listings" aria-label="Filters">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span class="lbl">Filters</span></a>
+    <button type="button" class="wl-switch wl-sw" role="switch" aria-checked="false" data-gst-toggle><span class="long">Display total price</span><span class="short">Total price</span> <i></i></button>
+  </div>
+
+  <!-- ROW A (follows category) -->
+  <section class="wl-sec" aria-labelledby="rowATitle">
+    <div class="wl-sec-h">
+      <h2 class="wl-h2" id="rowATitle"><a href="/listings"><%= rowATitle %><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a></h2>
+      <div class="wl-ctl"><a class="fl" href="/listings">Show all</a>
+        <button type="button" class="wl-arrow" data-pager="rowA" data-dir="-1" aria-label="Previous"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button type="button" class="wl-arrow" data-pager="rowA" data-dir="1" aria-label="Next"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
+    </div>
+    <% if (rowA.length) { %>
+      <div class="wl-grid" id="rowA" data-per="6"><% rowA.forEach(c => { %><%- include('../includes/card', { c }) %><% }) %></div>
+    <% } else { %>
+      <div class="wl-empty">No <%= activeCat.toLowerCase() %> stays yet. <a href="/listings/new" style="text-decoration:underline">Add one</a> or <a href="/listings" style="text-decoration:underline">see all stays</a>.</div>
+    <% } %>
+    <p class="wl-note" data-gst-note hidden>Prices include 18% GST.</p>
+  </section>
+
+  <!-- DESTINATIONS -->
+  <% if (destinations.length) { %>
+  <section class="wl-sec" aria-labelledby="destTitle">
+    <h2 class="wl-h2" id="destTitle">Explore by destination</h2>
+    <div class="wl-dests">
+      <% destinations.forEach(d => { %>
+        <a class="wl-dest" href="/listings?location=<%= encodeURIComponent(d.name) %>">
+          <% if (d.image) { %><img src="<%= d.image %>" alt="" loading="lazy"><% } %>
+          <div><b><%= d.name %></b><span><%= d.count %> <%= d.count === 1 ? 'stay' : 'stays' %></span></div>
+        </a>
+      <% }) %>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- ROWS B -->
+  <% [{ id: 'rowB1', title: 'Guest favourites this week', list: rowB1 }, { id: 'rowB2', title: 'Family-friendly stays', list: rowB2 }].forEach(r => { if (!r.list.length) return; %>
+  <section class="wl-sec" aria-labelledby="<%= r.id %>T">
+    <div class="wl-sec-h">
+      <h2 class="wl-h2" id="<%= r.id %>T"><a href="/listings"><%= r.title %><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a></h2>
+      <div class="wl-ctl"><a class="fl" href="/listings">Show all</a>
+        <button type="button" class="wl-arrow" data-pager="<%= r.id %>" data-dir="-1" aria-label="Previous"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button type="button" class="wl-arrow" data-pager="<%= r.id %>" data-dir="1" aria-label="Next"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
+    </div>
+    <div class="wl-grid" id="<%= r.id %>" data-per="6"><% r.list.forEach(c => { %><%- include('../includes/card', { c }) %><% }) %></div>
+  </section>
+  <% }) %>
+
+  <!-- FEATURED -->
+  <% if (featured) { %>
+  <section class="wl-feat" aria-label="Guest favourite of the week">
+    <div class="wl-feat-i"><% if (featured.image) { %><img src="<%= featured.image %>" alt="<%= featured.title %>" loading="lazy"><% } %></div>
+    <div class="wl-feat-t">
+      <span class="wl-chip">GUEST FAVOURITE OF THE WEEK</span>
+      <h2><%= featured.title %><% if (featured.location && featured.title.indexOf(featured.location) === -1) { %> in <%= featured.location %><% } %></h2>
+      <% if (featured.desc) { %><p><%= featured.desc.length > 180 ? featured.desc.slice(0, 177) + '...' : featured.desc %></p><% } %>
+      <% if (quote) { %>
+        <blockquote>&ldquo;<%= quote.text %>&rdquo;<footer>@<%= quote.by %> &middot; <%= '★'.repeat(Math.max(1, Math.min(5, Math.round(quote.rating)))) %></footer></blockquote>
+      <% } %>
+      <div class="wl-feat-b"><a class="wl-btn dark btn" href="/listings/<%= featured.id %>">View this stay</a><b>Rs <span data-price="<%= featured.price %>" data-bare><%= featured.priceText %></span> <span style="color:var(--gray);font-weight:500">/ night</span></b></div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- TRUST -->
+  <section class="wl-trust" aria-label="Why Wanderlust">
+    <div><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h4l2-3h4l2 3h4v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg><p style="margin:0"><b>Book by the night</b><span>Pick your dates and stay one night or more.</span></p></div>
+    <div><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><p style="margin:0"><b>Honest reviews</b><span>Ratings come only from guests.</span></p></div>
+    <div><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 10h16M8 15h3"/></svg><p style="margin:0"><b>Clear pricing</b><span>Price per night, with GST shown up front.</span></p></div>
+    <div><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7.5L21 11M5.5 9.5V20h13V9.5"/></svg><p style="margin:0"><b>Hosts across Pakistan</b><span>From valleys to city penthouses.</span></p></div>
+  </section>
+
+  <!-- BECOME A HOST -->
+  <section class="wl-hostcta" aria-label="Become a host">
+    <div>
+      <h2>Try hosting on Wanderlust</h2>
+      <p>Earn extra income and unlock new opportunities by sharing your space with travellers across Pakistan.</p>
+      <a class="wl-btn primary btn" href="/listings/new">Get started</a>
+    </div>
+    <div class="wl-hostcta-i"><% if (heroImage) { %><img src="<%= heroImage %>" alt="" loading="lazy"><% } %></div>
+  </section>
+
+  <!-- INSPIRATION -->
+  <section class="wl-insp" aria-labelledby="inspT">
+    <h2 id="inspT">Inspiration for future getaways</h2>
+    <div class="wl-itabs" role="tablist">
+      <% inspiration.forEach((t, i) => { %><button type="button" class="wl-itab" role="tab" id="itab<%= i %>" aria-selected="<%= i === 0 ? 'true' : 'false' %>" aria-controls="ipanel<%= i %>" data-itab="<%= i %>"><%= t.key %></button><% }) %>
+    </div>
+    <% inspiration.forEach((t, i) => { %>
+      <div class="wl-ipanel" role="tabpanel" id="ipanel<%= i %>" aria-labelledby="itab<%= i %>" <%= i === 0 ? '' : 'hidden' %>>
+        <% if (t.items.length) { t.items.forEach(d => { %>
+          <a href="/listings?location=<%= encodeURIComponent(d.name) %>"><b><%= d.name %></b><span><%= d.count %> <%= d.count === 1 ? 'stay' : 'stays' %></span></a>
+        <% }) } else { %><span style="color:var(--gray)">Nothing here yet.</span><% } %>
+      </div>
+    <% }) %>
+  </section>
+</div>

@@ -1,0 +1,29 @@
+<% layout('/layouts/boilerplate') -%>
+<section class="wl-ab-hero">
+  <div class="tx">
+    <span class="k">ABOUT WANDERLUST</span>
+    <h1>Smart stays. Better choices. A cleaner experience.</h1>
+    <p>Wanderlust is built for people who want trusted listings and review-backed decisions without clutter. From discovery to the detailed listing view, everything is designed for speed and clarity.</p>
+    <div class="btns"><a class="go" href="/listings">Explore stays</a><a class="ol" href="/stats">View live stats</a></div>
+  </div>
+  <div class="pics">
+    <% if (photos.length) { %>
+      <img class="big" src="<%= photos[0].url %>" alt="<%= photos[0].alt %>">
+      <% if (photos[1]) { %><img src="<%= photos[1].url %>" alt="<%= photos[1].alt %>"><% } %>
+      <% if (photos[2]) { %><img src="<%= photos[2].url %>" alt="<%= photos[2].alt %>"><% } %>
+    <% } else { %>
+      <span class="big ph"></span><span class="ph"></span><span class="ph"></span>
+    <% } %>
+  </div>
+</section>
+
+<section class="wl-ab-cards">
+  <div><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d70466" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><h3>Discover faster</h3><p>Find relevant stays quickly with polished cards, clear pricing and smooth browsing.</p></div>
+  <div><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d70466" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><h3>Trust community signals</h3><p>Most reviewed and top rated listings are highlighted so you can spot trusted options instantly.</p></div>
+  <div><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d70466" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg><h3>Built for real usage</h3><p>Pagination, filters and a responsive layout make the platform practical on mobile and desktop.</p></div>
+</section>
+
+<section class="wl-ab-by">
+  <div><h3>Built by imeer.ai</h3><p>Full-stack project with Node, Express, MongoDB and EJS.</p></div>
+  <a href="https://github.com/imeerai" target="_blank" rel="noopener noreferrer">GitHub: imeerai</a>
+</section>

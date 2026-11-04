@@ -1,0 +1,39 @@
+<% layout('/layouts/auth') -%>
+<% const E = errors || {}; const V = values || {}; %>
+<div class="wl-auth">
+  <%- include('../includes/authHero', { hero, headline: 'Join travellers and hosts across Pakistan.' }) %>
+  <section class="wl-auth-form">
+    <form id="signupForm" action="/register" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div><h1>Create your account</h1><p class="lead">It takes less than a minute.</p></div>
+
+      <div id="formAlert"><% if (Object.keys(E).length) { %><div class="wl-alert" role="alert">Please fix the highlighted fields.</div><% } %></div>
+
+      <label class="wl-field">Username
+        <input name="user[username]" type="text" value="<%= V.username || '' %>" placeholder="lowercase, numbers, . or _" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" data-req="Choose a username" aria-invalid="<%= E.username ? 'true' : 'false' %>" required>
+        <span class="msg <%= E.username ? 'bad' : '' %>" data-msg="username"><%= E.username || '' %></span>
+      </label>
+      <label class="wl-field">Email
+        <input name="user[email]" type="email" value="<%= V.email || '' %>" placeholder="you@example.com" autocomplete="email" maxlength="254" data-req="Enter your email address" aria-invalid="<%= E.email ? 'true' : 'false' %>" required>
+        <span class="msg <%= E.email ? 'bad' : '' %>" data-msg="email"><%= E.email || '' %></span>
+      </label>
+      <label class="wl-field">Password
+        <span class="pw">
+          <input name="user[password]" type="password" placeholder="8+ characters" autocomplete="new-password" maxlength="128" aria-invalid="<%= E.password ? 'true' : 'false' %>" data-req="Create a password" required>
+          <button type="button" data-pw-toggle aria-label="Show or hide password">Show</button>
+        </span>
+        <span class="msg <%= E.password ? 'bad' : '' %>" data-msg="password"><%= E.password || '' %></span>
+        <span class="msg caps" data-caps hidden>Caps Lock is on</span>
+      </label>
+      <div class="wl-meter" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="wl-rules">
+        <span data-rule="len">○ At least 8 characters</span>
+        <span data-rule="mix">○ Letters and a number</span>
+        <span data-rule="sym">○ One symbol (e.g. ! @ #)</span>
+      </div>
+
+      <button type="submit" class="wl-cta">Create account</button>
+      <p class="alt">Already have an account? <a href="/login">Log in</a></p>
+    </form>
+  </section>
+</div>

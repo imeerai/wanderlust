@@ -1,0 +1,93 @@
+<%
+  const editing = mode === 'edit';
+  const action = editing ? `/listings/${L.id}?_method=PUT&_csrf=${encodeURIComponent(csrfToken)}` : `/listings?_csrf=${encodeURIComponent(csrfToken)}`;
+  const AMEN = amenityList;
+  const picked = new Set(L.amenities || []);
+%>
+<main class="wl-nl">
+  <form id="wlListingForm" class="wl-nl-form" method="POST" action="<%= action %>" enctype="multipart/form-data" novalidate>
+    <div>
+      <h1><%= editing ? 'Edit your listing' : 'Create a new listing' %></h1>
+      <p class="lead">Tell guests about your place. The preview updates as you type.</p>
+    </div>
+
+    <% if (errors && errors.length) { %>
+    <div class="wl-alert" role="alert"><% errors.forEach(m => { %><div><%= m %></div><% }) %></div>
+    <% } %>
+
+    <label class="wl-field">Title
+      <input name="listing[title]" value="<%= L.title %>" placeholder="e.g. Royal Villa in Swat" maxlength="80" required data-f="title" data-rule="title">
+      <span class="msg bad" data-msg role="alert"></span>
+    </label>
+
+    <% if (editing) { %>
+    <div class="two">
+      <label class="wl-field">Location
+        <input name="listing[location]" value="<%= L.location %>" placeholder="City or area" maxlength="60" required data-f="place" data-rule="place">
+        <span class="msg bad" data-msg role="alert"></span>
+      </label>
+      <label class="wl-field">Country
+        <input name="listing[country]" value="<%= L.country %>" maxlength="60" required>
+      </label>
+    </div>
+    <% } else { %>
+    <label class="wl-field">Location in Pakistan
+      <input name="listing[location]" value="<%= L.location %>" placeholder="City or area, e.g. Swat" maxlength="60" required data-f="place" data-rule="place">
+      <span class="msg bad" data-msg role="alert"></span>
+    </label>
+    <input type="hidden" name="listing[country]" value="<%= L.country || 'Pakistan' %>">
+    <% } %>
+
+    <div class="two">
+      <label class="wl-field">Price per night (Rs)
+        <input name="listing[prize]" type="number" inputmode="numeric" min="10" max="10000000" value="<%= L.prize %>" placeholder="Min Rs 10" required data-f="price" data-rule="price">
+        <span class="msg bad" data-msg role="alert"></span>
+        <span class="sub" id="gstHint">Guests see Rs 0 when GST (18%) is included.</span>
+      </label>
+      <label class="wl-field">Max guests
+        <input name="listing[maxGuests]" type="number" inputmode="numeric" min="1" max="30" value="<%= L.maxGuests %>" required data-rule="guests">
+        <span class="msg bad" data-msg role="alert"></span>
+        <span class="sub">Bookings stop at this number.</span>
+      </label>
+    </div>
+
+    <label class="wl-field">Description
+      <textarea name="listing[description]" rows="5" maxlength="2000" placeholder="What makes your place special?" required data-rule="desc" data-f="desc"><%= L.description %></textarea>
+      <span class="msg bad" data-msg role="alert"></span>
+      <span class="sub" id="descCount">0 / 2000</span>
+    </label>
+
+    <fieldset class="wl-amen">
+      <legend>What this place offers</legend>
+      <div>
+        <% AMEN.forEach(a => { %>
+        <label><input type="checkbox" name="listing[amenities]" value="<%= a %>" <%= picked.has(a) ? 'checked' : '' %>><span><%= a %></span></label>
+        <% }) %>
+      </div>
+    </fieldset>
+
+    <div class="wl-field">Photo
+      <label class="wl-drop" id="dropZone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>
+        <b id="dropText"><%= editing ? 'Drag a new photo here to replace the current one' : 'Drag a photo here or click to upload' %></b>
+        <span class="sub">JPG, PNG or WebP, up to 5 MB</span>
+        <input type="file" name="listing[image]" id="photoInput" accept="image/jpeg,image/png,image/webp" aria-label="Upload photo" <%= editing ? '' : 'required' %>>
+      </label>
+      <span class="msg bad" id="photoMsg" role="alert"></span>
+    </div>
+
+    <div class="btns">
+      <button type="submit" class="wl-cta" id="saveBtn"><%= editing ? 'Save changes' : 'Add listing' %></button>
+      <a class="wl-cancel" href="<%= editing ? '/listings/' + L.id : '/profile' %>">Cancel</a>
+    </div>
+  </form>
+
+  <aside class="wl-nl-prev">
+    <span class="k">LIVE PREVIEW</span>
+    <div class="card">
+      <div class="ph"><img id="pvImg" src="<%= L.imageUrl %>" alt="Preview photo" <%= L.imageUrl ? '' : 'hidden' %>></div>
+      <div class="tx"><b id="pvTitle">Your listing title</b><span id="pvPlace">Location</span><span><b id="pvPrice">Rs 0</b> / night</span></div>
+    </div>
+  </aside>
+</main>
+<script src="/js/listingform.js" defer></script>

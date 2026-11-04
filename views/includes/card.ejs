@@ -1,0 +1,16 @@
+<a class="wl-card" href="/listings/<%= c.id %>">
+  <div class="ph">
+    <img src="<%= c.image %>" alt="<%= c.title %>" loading="lazy" width="400" height="400">
+    <% if (c.rating.count >= 3 && c.rating.average >= 4.5) { %><span class="wl-badge">Guest favourite</span><% } %>
+    <button type="button" class="wl-heart" data-heart="<%= c.id %>" aria-pressed="<%= c.saved ? 'true' : 'false' %>" aria-label="Save to wishlist">
+      <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 5.8-8 11-8 11z"/></svg>
+    </button>
+  </div>
+  <div class="tx">
+    <b><%= c.title %><% if (c.location && c.title.indexOf(c.location) === -1) { %> in <%= c.location %><% } %></b>
+    <span class="h">Hosted by <%= c.host %></span>
+    <span class="p"><span data-price="<%= c.price %>">Rs <%= c.priceText %></span><span> / night</span><span aria-hidden="true">&middot;</span>
+      <% if (c.rating.count) { %><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><%= c.rating.average.toFixed(1) %><% } else { %>New<% } %>
+    </span>
+  </div>
+</a>

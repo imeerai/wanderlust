@@ -1,0 +1,193 @@
+<% layout('/layouts/boilerplate') -%>
+<%
+  const L = listing;
+  const hostName = L.Owner ? L.Owner.username : 'a host';
+  const AM_ICON = {
+    'Wi-Fi': 'M2 9a16 16 0 0120 0M5 13a11 11 0 0114 0M8.5 16.5a6 6 0 017 0M12 20h.01',
+    'Pool': 'M3 18c3 0 3-2 6-2s3 2 6 2 3-2 6-2M3 13c3 0 3-2 6-2s3 2 6 2 3-2 6-2M8 4v7M15 4v7',
+    'Kitchen': 'M6 3v8M10 3v8M8 11v10M16 3c-2 2-2 6 0 8v10',
+    'Parking': 'M7 20V4h6a4 4 0 010 8H7',
+    'Work space': 'M3 5h18v12H3zM8 21h8M12 17v4' };
+  const star = 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z';
+  const where = [L.location, L.country].filter(Boolean).join(', ');
+%>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<div class="wl-page wl-show" style="gap:18px;padding-top:20px">
+
+  <!-- TITLE -->
+  <div class="wl-show-h">
+    <div class="wl-show-t">
+      <nav class="wl-crumb" aria-label="Breadcrumb"><a href="/listings">Stays</a><span aria-hidden="true">/</span><span><%= L.location || L.title %></span></nav>
+      <h1><%= L.title %></h1>
+      <div class="wl-meta">
+        <% if (rating.count) { %><span class="rt"><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="<%= star %>"/></svg><%= rating.average.toFixed(1) %></span><span aria-hidden="true">&middot;</span><a href="#reviews" style="text-decoration:underline"><%= rating.count %> <%= rating.count === 1 ? 'review' : 'reviews' %></a><span aria-hidden="true">&middot;</span><% } %>
+        <span style="color:var(--gray)"><%= where %></span>
+        <% if (rating.count >= 3 && rating.average >= 4.5) { %><span class="wl-chip" style="letter-spacing:0">Guest favourite</span><% } %>
+      </div>
+    </div>
+    <div class="wl-show-a">
+      <button type="button" class="wl-pillbtn" data-share data-title="<%= L.title %>"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M5 12v8h14v-8"/></svg>Share</button>
+      <button type="button" class="wl-pillbtn wl-heart-b" data-heart="<%= L._id %>" aria-pressed="<%= saved ? 'true' : 'false' %>"><svg width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 5.8-8 11-8 11z"/></svg><span class="lbl">Save</span></button>
+    </div>
+  </div>
+
+  <!-- GALLERY (one photo per listing today) -->
+  <div class="wl-gal">
+    <img src="<%= imgOf(L) %>" alt="<%= L.title %>">
+  </div>
+
+  <div class="wl-cols">
+    <div class="wl-left">
+
+      <!-- OVERVIEW -->
+      <section class="wl-blk" style="border-top:0;padding-top:0">
+        <div class="wl-host-card">
+          <% if (L.Owner) { %><a href="/profile/<%= L.Owner._id %>" class="wl-av" aria-label="View @<%= hostName %>'s profile"><%= hostName.charAt(0) %></a><% } else { %><span class="wl-av">?</span><% } %>
+          <div class="who">
+            <h2>Hosted by <% if (L.Owner) { %><a href="/profile/<%= L.Owner._id %>">@<%= hostName %></a><% } else { %>a host<% } %></h2>
+            <p class="wl-sub2">Up to <%= L.maxGuests || 6 %> guests &middot; <%= hostCount %> <%= hostCount === 1 ? 'listing' : 'listings' %> by this host</p>
+          </div>
+          <% if (L.Owner) { %><a class="wl-pillbtn" href="/profile/<%= L.Owner._id %>">View profile</a><% } %>
+        </div>
+        <p class="wl-desc"><%= (L.description || '').trim() %></p>
+      </section>
+
+      <!-- AMENITIES -->
+      <section class="wl-blk">
+        <h2>What this place offers</h2>
+        <% if (L.amenities && L.amenities.length) { %>
+          <div class="wl-amen">
+            <% L.amenities.forEach(a => { %><div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="<%= AM_ICON[a] || 'M5 12l5 5 9-10' %>"/></svg><%= a %></div><% }) %>
+          </div>
+        <% } else { %><p class="wl-sub2">The host has not listed amenities yet.</p><% } %>
+      </section>
+
+      <!-- REVIEWS -->
+      <section class="wl-blk" id="reviews">
+        <h2>Guest reviews</h2>
+        <% if (!reviews.length) { %>
+          <p class="wl-sub2">No reviews yet. Be the first to share your stay.</p>
+        <% } else { %>
+          <div class="wl-revs">
+            <% reviews.forEach(r => { const mine = currentUser && r.author && String(r.author._id) === String(currentUser._id); %>
+              <article class="wl-rev">
+                <div class="top">
+                  <span class="wl-av sm"><%= r.author ? r.author.username.charAt(0) : '?' %></span>
+                  <div style="flex:1;min-width:0"><% if (r.author) { %><a href="/profile/<%= r.author._id %>" style="font-weight:800;font-size:14px">@<%= r.author.username %></a><% } else { %><b>Former guest</b><% } %>
+                    <div style="font-size:12px;color:var(--gray)"><%= new Date(r.created_At).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %></div></div>
+                  <span class="rt"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="<%= star %>"/></svg><%= r.rating %></span>
+                  <% if (mine) { %>
+                    <form method="POST" action="/listings/<%= L._id %>/reviews/<%= r._id %>?_method=DELETE">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button class="wl-x" aria-label="Delete your review">&times;</button>
+                    </form>
+                  <% } %>
+                </div>
+                <p><%= r.comment %></p>
+              </article>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (canReview) { %>
+        <form class="wl-revform" method="POST" action="/listings/<%= L._id %>/reviews">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <fieldset class="wl-stars"><legend class="wl-sr">Rating</legend>
+            <% for (let i = 5; i >= 1; i--) { %><input type="radio" name="review[rating]" id="rt<%= i %>" value="<%= i %>" required><label for="rt<%= i %>" title="<%= i %> stars"><span class="wl-sr"><%= i %> stars</span><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="<%= star %>"/></svg></label><% } %>
+          </fieldset>
+          <label class="wl-grow"><span class="wl-sr">Your review</span><input type="text" name="review[comment]" placeholder="Leave a review..." maxlength="600" required></label>
+          <button type="submit" class="wl-btn dark" style="min-height:46px;padding:0 22px;font-size:14px">Post</button>
+        </form>
+        <% } else if (!currentUser) { %>
+          <p class="wl-sub2"><a href="/login" style="text-decoration:underline;font-weight:700">Log in</a> to leave a review.</p>
+        <% } else if (hasReviewed) { %>
+          <p class="wl-sub2">Thanks for reviewing this stay.</p>
+        <% } %>
+      </section>
+
+      <!-- LOCATION -->
+      <section class="wl-blk" id="location">
+        <h2>Where you'll be</h2>
+        <p class="wl-sub2" style="margin:0"><%= where %><%= mapData.exact ? '' : ' (area not found, showing Pakistan)' %>. Exact address is shared after booking.</p>
+        <div class="wl-mapbox">
+          <div id="listingMap" class="wl-map" data-lat="<%= mapData.lat %>" data-lng="<%= mapData.lng %>" data-zoom="<%= mapData.exact ? 10 : 5 %>" data-label="<%= mapData.label %>" role="region" aria-label="Map of <%= where %>"></div>
+          <noscript><p class="wl-sub2">Turn on JavaScript to see the map.</p></noscript>
+        </div>
+        <div class="wl-maptools">
+          <button type="button" class="wl-pillbtn" id="mapLocate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Route from my location</button>
+          <a class="wl-pillbtn" id="mapDir" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&destination=<%= mapData.lat %>,<%= mapData.lng %>&travelmode=driving">Open in Google Maps</a>
+        </div>
+        <p class="wl-sub2 wl-route" id="mapRoute" role="status" aria-live="polite" hidden></p>
+      </section>
+
+      <!-- THINGS TO KNOW -->
+      <section class="wl-blk">
+        <h2>Things to know</h2>
+        <div class="wl-know">
+          <div><b>House rules</b><br><span>Check-in after 2:00 PM &middot; Checkout before 11:00 AM &middot; No parties</span></div>
+          <div><b>Cancellation</b><br><span>Cancel any time from your profile before check-in.</span></div>
+          <div><b>Safety</b><br><span>Secure environment, host reachable during your stay.</span></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- BOOKING CARD -->
+    <aside class="wl-book" aria-label="Reserve this stay">
+      <div class="wl-book-p"><b id="bkNightPrice">Rs <%= (L.prize || 0).toLocaleString('en-US') %></b><span>/ night</span></div>
+
+      <% if (isOwner) { %>
+        <p class="wl-sub2" style="margin:0">This is your listing. Guests can book it from here.</p>
+        <a class="wl-btn dark" href="/listings/<%= L._id %>/edit">Edit listing</a>
+        <button type="button" class="wl-btn wl-danger" data-open="wlDelete">Delete listing</button>
+      <% } else { %>
+      <form id="wlBook" action="/listings/<%= L._id %>/bookings" method="POST" data-price="<%= L.prize || 0 %>" data-max="<%= L.maxGuests || 6 %>" data-today="<%= today %>" data-booked="<%= JSON.stringify(booked) %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="checkIn" id="bkIn"><input type="hidden" name="checkOut" id="bkOut"><input type="hidden" name="guests" id="bkGuests" value="1">
+        <div class="wl-bkbox">
+          <div class="r2">
+            <button type="button" id="bkInBtn" aria-expanded="false" aria-controls="bkCalBox"><span>CHECK-IN</span><b class="ph">Add date</b></button>
+            <button type="button" id="bkOutBtn" aria-expanded="false" aria-controls="bkCalBox"><span>CHECKOUT</span><b class="ph">Add date</b></button>
+          </div>
+          <div class="g"><div><span>GUESTS</span><b id="bkGuestTxt">1 guest</b></div>
+            <div class="wl-step"><button type="button" id="bkLess" aria-label="Fewer guests">&minus;</button><button type="button" id="bkMore" aria-label="More guests">+</button></div></div>
+        </div>
+        <div class="wl-bkcal" id="bkCalBox" hidden>
+          <div class="wl-cal-h"><button type="button" id="bkPrev" aria-label="Previous month">&lsaquo;</button><span id="bkMonth"></span><button type="button" id="bkNext" aria-label="Next month">&rsaquo;</button></div>
+          <div class="wl-cal-w"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+          <div class="wl-cal-g" id="bkCal"></div>
+          <div class="wl-bkhint"><span id="bkHint">Pick your check-in day</span><button type="button" id="bkClear">Clear</button></div>
+        </div>
+        <% if (currentUser) { %>
+          <button type="submit" class="wl-btn primary wl-reserve" id="bkGo" disabled>Select dates</button>
+        <% } else { %>
+          <a class="wl-btn primary wl-reserve" href="/login">Log in to reserve</a>
+        <% } %>
+        <div id="bkSum" hidden>
+          <div class="wl-line"><span id="bkSumA"></span><span id="bkSub"></span></div>
+          <div class="wl-line"><span>GST (18%)</span><span id="bkGst"></span></div>
+          <div class="wl-line tot"><span>Total</span><span id="bkTot"></span></div>
+        </div>
+        <p class="wl-note" id="bkNote" style="text-align:center">Pick dates to see your total. 1 night or more, you won't be charged yet.</p>
+      </form>
+      <% } %>
+    </aside>
+  </div>
+</div>
+
+<% if (isOwner) { %>
+<div class="wl-modal" id="wlDelete" role="dialog" aria-modal="true" aria-label="Delete listing" hidden>
+  <div class="wl-modal-box" style="max-width:480px">
+    <div class="wl-modal-h"><button type="button" data-close aria-label="Close">&times;</button><b>Delete this listing?</b><span style="width:44px"></span></div>
+    <div class="wl-modal-b"><p style="margin:0;color:var(--gray)">This permanently removes &ldquo;<%= L.title %>&rdquo; with its reviews and bookings. This cannot be undone.</p></div>
+    <form class="wl-modal-f" method="POST" action="/listings/<%= L._id %>?_method=DELETE">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="button" data-close class="clr" style="border:0;background:transparent">Keep it</button>
+      <button type="submit" class="wl-btn btn wl-danger-fill">Delete listing</button>
+    </form>
+  </div>
+</div>
+<% } %>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="/js/show.js" defer></script>

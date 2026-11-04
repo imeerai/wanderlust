@@ -1,0 +1,32 @@
+<% layout('/layouts/boilerplate') -%>
+<main class="wl-page" data-wishlist-page style="padding-top:32px;gap:28px;min-height:60vh">
+  <div class="wl-wish-h">
+    <h1>Wishlist</h1>
+    <span data-wish-count><%= items.length %> saved</span>
+  </div>
+  <% if (items.length) { %>
+  <div class="wl-grid wl-grid-lg">
+    <% items.forEach(c => { %>
+    <a class="wl-card" data-wish-card href="/listings/<%= c.id %>">
+      <div class="ph">
+        <img src="<%= c.image %>" alt="<%= c.title %>" loading="lazy" width="400" height="400">
+        <button type="button" class="wl-heart" data-heart="<%= c.id %>" aria-pressed="true" aria-label="Remove from wishlist">
+          <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 5.8-8 11-8 11z"/></svg>
+        </button>
+      </div>
+      <div class="tx">
+        <div class="wl-row2"><b><%= c.title %></b>
+          <span class="rt"><% if (c.rating.count) { %><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><%= c.rating.average.toFixed(1) %><% } else { %>New<% } %></span></div>
+        <span class="h"><%= c.location %></span>
+        <span class="p"><b data-price="<%= c.price %>">Rs <%= c.priceText %></b><span> / night</span></span>
+      </div>
+    </a>
+    <% }) %>
+  </div>
+  <% } %>
+  <div class="wl-wish-empty" data-wish-empty <%= items.length ? 'hidden' : '' %>>
+    <h2>No saved stays yet</h2>
+    <p>As you search, tap the heart to save places you like.</p>
+    <a href="/listings">Start exploring</a>
+  </div>
+</main>

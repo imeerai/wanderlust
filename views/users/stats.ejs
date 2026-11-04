@@ -1,0 +1,41 @@
+<% layout('/layouts/boilerplate') -%>
+<% const top = platformStats.topReviewedListing; %>
+<div class="wl-page wl-stats">
+  <div class="wl-st-head">
+    <span class="k">LIVE DASHBOARD</span>
+    <h1>Wanderlust platform pulse</h1>
+    <p>A snapshot of community growth and listing engagement, straight from the database.</p>
+  </div>
+
+  <div class="wl-st-grid">
+    <div class="wl-st-card">
+      <span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d70466" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M16 4.5a3.5 3.5 0 010 7M18 14c2.5.6 4 2.6 4 5"/></svg></span>
+      <div class="l">Total users</div><div class="n"><%= platformStats.totalUsers.toLocaleString('en-US') %></div>
+    </div>
+    <div class="wl-st-card">
+      <span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d70466" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7.5L21 11M5.5 9.5V20h13V9.5"/></svg></span>
+      <div class="l">Total listings</div><div class="n"><%= platformStats.totalListings.toLocaleString('en-US') %></div>
+    </div>
+    <div class="wl-st-card">
+      <span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d70466" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>
+      <div class="l">Total reviews</div><div class="n"><%= platformStats.totalReviews.toLocaleString('en-US') %></div>
+    </div>
+  </div>
+
+  <section class="wl-st-top">
+    <h2>Most reviewed post</h2>
+    <% if (top) { %>
+    <div class="box">
+      <% if (top.imageUrl) { %><img src="<%= top.imageUrl %>" alt="<%= top.title %>"><% } else { %><span class="noimg"></span><% } %>
+      <div class="tx">
+        <span class="wl-st-badge"><%= top.reviewCount %> <%= top.reviewCount === 1 ? 'review' : 'reviews' %> &middot; top post</span>
+        <h3><%= top.title %></h3>
+        <p><%= top.location %> &middot; hosted by @<%= top.owner %></p>
+        <a href="/listings/<%= top.id %>">View post</a>
+      </div>
+    </div>
+    <% } else { %>
+    <div class="wl-empty">No reviewed listing yet. Be the first to leave a review.</div>
+    <% } %>
+  </section>
+</div>

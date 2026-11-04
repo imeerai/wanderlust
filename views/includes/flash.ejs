@@ -1,0 +1,8 @@
+<% const okMsgs = (typeof success !== 'undefined' && success) ? [].concat(success) : []; %>
+<% const errMsgs = (typeof error !== 'undefined' && error) ? [].concat(error) : []; %>
+<% if (okMsgs.length || errMsgs.length) { %>
+  <div class="wl-flash" role="status" aria-live="polite">
+    <% okMsgs.forEach(m => { %><div class="wl-msg ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M8 12.5l3 3 5-6"/></svg><span><%= m %></span><button type="button" data-x aria-label="Dismiss">&times;</button></div><% }) %>
+    <% errMsgs.forEach(m => { %><div class="wl-msg err" role="alert"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg><span><%= m %></span><button type="button" data-x aria-label="Dismiss">&times;</button></div><% }) %>
+  </div>
+<% } %>

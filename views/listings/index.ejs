@@ -1,0 +1,99 @@
+<% layout('/layouts/boilerplate') -%>
+<%
+  const S = selectedFilters;
+  const labels = { recent: 'Newest', rated: 'Top rated', priceAsc: 'Price: low to high', priceDesc: 'Price: high to low' };
+%>
+<!-- FILTER ROW -->
+<section class="wl-frow">
+  <div class="wl-chips" role="group" aria-label="Sort by">
+    <% sortLinks.forEach(s => { %>
+      <a class="wl-chip-b" href="/listings<%= s.qs ? '?' + s.qs : '' %>" aria-pressed="<%= s.key === sort ? 'true' : 'false' %>"><%= labels[s.key] %></a>
+    <% }) %>
+  </div>
+  <button type="button" class="wl-switch wl-sw" role="switch" aria-checked="false" data-gst-toggle><span class="long">Display total price</span><span class="short">Total price</span> <i></i></button>
+  <button type="button" class="wl-fbtn" data-open="wlFilters" aria-haspopup="dialog">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span class="lbl">Filters</span><% if (filterCount) { %><span class="wl-count" style="background:var(--ink);color:var(--bg)"><%= filterCount %></span><% } %>
+  </button>
+</section>
+
+<div class="wl-page" style="padding-top:28px;gap:20px">
+  <div>
+    <h1 style="margin:0;font-weight:800;font-size:30px;letter-spacing:-.6px">All stays</h1>
+    <div style="color:var(--gray);margin-top:4px"><%= total %> <%= total === 1 ? 'stay' : 'stays' %> across Pakistan<% if (S.location) { %> matching &ldquo;<%= S.location %>&rdquo;<% } %></div>
+  </div>
+
+  <% if (stays.length) { %>
+  <div class="wl-grid wl-grid-lg">
+    <% stays.forEach(c => { %>
+    <a class="wl-card" href="/listings/<%= c.id %>">
+      <div class="ph">
+        <img src="<%= c.image %>" alt="<%= c.title %>" loading="lazy" width="400" height="400">
+        <% if (c.rating.count >= 3 && c.rating.average >= 4.5) { %><span class="wl-badge">Guest favourite</span><% } %>
+        <button type="button" class="wl-heart" data-heart="<%= c.id %>" aria-pressed="<%= c.saved ? 'true' : 'false' %>" aria-label="Save to wishlist">
+          <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 5.8-8 11-8 11z"/></svg></button>
+      </div>
+      <div class="tx">
+        <div class="wl-row2"><b><%= c.location || c.title %></b>
+          <span class="rt"><% if (c.rating.count) { %><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><%= c.rating.average.toFixed(1) %> <span style="color:var(--gray)">(<%= c.rating.count %>)</span><% } else { %>New<% } %></span></div>
+        <span class="h"><%= c.title %></span>
+        <span class="p"><b data-price="<%= c.price %>">Rs <%= c.priceText %></b><span> / night</span></span>
+      </div>
+    </a>
+    <% }) %>
+  </div>
+  <p class="wl-note" data-gst-note hidden>Prices include 18% GST.</p>
+  <% } else { %>
+  <div class="wl-empty" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:56px 20px">
+    <b style="font-size:22px;color:var(--ink)">No stays match these filters</b>
+    <span>Try a higher price limit, a different place or fewer amenities.</span>
+    <a class="wl-btn dark btn" href="/listings">Clear all filters</a>
+  </div>
+  <% } %>
+
+  <% if (totalPages > 1) { %>
+  <% const pageHref = (n) => '/listings?' + (pageQs ? pageQs + '&' : '') + 'page=' + n; %>
+  <nav class="wl-pager" aria-label="Pagination">
+    <% if (currentPage > 1) { %><a class="pg" rel="prev" href="<%= pageHref(currentPage - 1) %>" aria-label="Previous page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a><% } else { %><span class="pg off" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></span><% } %>
+    <span class="of" aria-current="page">Page <b><%= currentPage %></b> of <%= totalPages %></span>
+    <% if (currentPage < totalPages) { %><a class="pg" rel="next" href="<%= pageHref(currentPage + 1) %>" aria-label="Next page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a><% } else { %><span class="pg off" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span><% } %>
+  </nav>
+  <% } %>
+</div>
+
+<!-- FILTER MODAL -->
+<div class="wl-modal" id="wlFilters" role="dialog" aria-modal="true" aria-label="Filters" hidden>
+  <form class="wl-modal-box" action="/listings" method="GET" id="wlFilterForm">
+    <div class="wl-modal-h"><button type="button" data-close aria-label="Close">&times;</button><b>Filters</b><span style="width:44px"></span></div>
+    <div class="wl-modal-b">
+      <% if (S.location) { %><input type="hidden" name="location" value="<%= S.location %>"><% } %>
+      <% if (S.country) { %><input type="hidden" name="country" value="<%= S.country %>"><% } %>
+      <% if (S.sort !== 'recent') { %><input type="hidden" name="sort" value="<%= S.sort %>"><% } %>
+
+      <div><b class="wl-fh">Max price per night</b>
+        <p class="wl-fhint">Type an amount or pick one. Leave empty to see every price.</p>
+        <label class="wl-money">
+          <span class="cur">Rs</span>
+          <input type="number" name="maxPrice" id="wlPrice" inputmode="numeric" min="500" max="10000000" step="500" placeholder="Any price" value="<%= S.maxPrice || '' %>" aria-label="Maximum price per night in rupees">
+          <span class="per">/ night</span>
+        </label>
+        <div class="wl-opts" style="margin-top:12px">
+          <% [['', 'Any price'], [5000, 'Up to 5,000'], [10000, 'Up to 10,000'], [20000, 'Up to 20,000'], [35000, 'Up to 35,000']].forEach(p => { %>
+            <button type="button" class="wl-pchip" data-price-chip="<%= p[0] %>" aria-pressed="false"><%= p[1] %></button>
+          <% }) %>
+        </div></div>
+
+      <div><b class="wl-fh">Minimum rating</b>
+        <div class="wl-opts">
+          <% [[0,'Any'],[3.5,'3.5+'],[4,'4.0+'],[4.5,'4.5+']].forEach(r => { %>
+            <label class="wl-opt-chip"><input type="radio" name="minRating" value="<%= r[0] %>" <%= Number(S.minRating) === r[0] ? 'checked' : '' %>><span><%= r[1] %></span></label>
+          <% }) %></div></div>
+
+      <div><b class="wl-fh">Amenities</b>
+        <div class="wl-opts">
+          <% amenityList.forEach(a => { %>
+            <label class="wl-opt-chip"><input type="checkbox" name="amenities" value="<%= a %>" <%= S.amenities.includes(a) ? 'checked' : '' %>><span><%= a %></span></label>
+          <% }) %></div></div>
+    </div>
+    <div class="wl-modal-f"><a href="/listings<%= S.location ? '?location=' + encodeURIComponent(S.location) : '' %>" class="clr">Clear all</a><button type="submit" class="wl-btn dark btn">Show stays</button></div>
+  </form>
+</div>
